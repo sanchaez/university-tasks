@@ -6,6 +6,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <alghoritmscollection.h>
+#include <QElapsedTimer>
 
 namespace Ui {
 class MainWindow;

@@ -92,9 +92,9 @@ const QList<Line> demo_surname
     Line(21, 32, 26, 31),
     Line(26, 28, 26, 39),
     //n
+    Line(37, 28, 37, 39),
     Line(29, 28, 29, 39),
     Line(29, 28, 37, 39),
-    Line(37, 28, 37, 39),
     //i
     Line(40, 28, 45, 28),
     Line(40, 39, 45, 39),
@@ -116,7 +116,7 @@ const QList<Line> demo_surname
 const QList<Circle> demo_circles
 {
     Circle(5, 5, 5),
-            Circle(50, 50, 40),
+            Circle(50, 50, 45),
             Circle(30, 14, 10)
 };
 }

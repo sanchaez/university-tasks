@@ -6,7 +6,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    image(new QImage(100, 100, QImage::Format_RGB32))
+    image(new QImage(100, 100, QImage::Format_ARGB32_Premultiplied))
 {
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
@@ -37,29 +37,35 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_on_index_change(int index)
 {
+    QElapsedTimer timer;
     image->fill(Qt::black);
     switch(static_cast<MainWindow::Algorithm>(index)) {
     case MainWindow::DDA:
+        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.ddaPath(image);
         }
         break;
     case MainWindow::Bresenham_lines:
+        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.bresenhamPath(image);
         }
         break;
     case MainWindow::Bresenham_circles:
+        timer.start();
         foreach(auto x, alg::demo_circles) {
             x.bresenhamPath(image);
         }
         break;
     case MainWindow::Wu:
+        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.wuPath(image);
         }
         break;
     }
+    ui->timeTaken->setText(QString("Time taken: %1 msec").arg(timer.elapsed()));
     update_image();
 }
 
