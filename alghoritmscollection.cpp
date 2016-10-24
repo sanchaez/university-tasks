@@ -25,17 +25,20 @@ QImage &alg::Circle::bresenhamPath(QImage *img)
 {
     uint x = 0;
     uint y = _radius;
-    int parameter = 3 - 2 * _radius;
-    while (x < y) {
+    int y_incr = 1 - 2 * static_cast<int>(_radius);
+    int x_incr = 1;
+    int radius_error = 0;
+    _bresenhamPathAux(img, x, y);
+    while (x <= y) {
         _bresenhamPathAux(img, x, y);
         ++x;
-        if (parameter < 0) {
-            parameter +=  4 * x ;
-        } else {
+        radius_error += x_incr;
+        x_incr += 2;
+        if ((2 * radius_error + y_incr) >= 0) {
             --y;
-            parameter += 4 * (x - y);
+            radius_error += y_incr;
+            y_incr += 2;
         }
-        _bresenhamPathAux(img, x, y);
     }
     return *img;
 }
@@ -58,15 +61,14 @@ uint alg::Shape::getScaleFactor()
 void alg::Circle::_bresenhamPathAux(QImage *draw_canvas, const uint x, const uint y)
 {
     //draw 8 parts at once
-    delay();
-    draw_canvas->setPixel(_x + x, _y + y, _color.rgb());
-    draw_canvas->setPixel(_x - x, _y + y, _color.rgb());
-    draw_canvas->setPixel(_x + x, _y - y, _color.rgb());
-    draw_canvas->setPixel(_x - x, _y - y, _color.rgb());
-    draw_canvas->setPixel(_x + y, _y + x, _color.rgb());
-    draw_canvas->setPixel(_x - y, _y + x, _color.rgb());
-    draw_canvas->setPixel(_x + y, _y - x, _color.rgb());
-    draw_canvas->setPixel(_x - y, _y - x, _color.rgb());
+    draw_canvas->setPixel(_x + x, _y + y, _color.rgba());
+    draw_canvas->setPixel(_x - x, _y + y, _color.rgba());
+    draw_canvas->setPixel(_x + x, _y - y, _color.rgba());
+    draw_canvas->setPixel(_x - x, _y - y, _color.rgba());
+    draw_canvas->setPixel(_x + y, _y + x, _color.rgba());
+    draw_canvas->setPixel(_x - y, _y + x, _color.rgba());
+    draw_canvas->setPixel(_x + y, _y - x, _color.rgba());
+    draw_canvas->setPixel(_x - y, _y - x, _color.rgba());
 }
 
 
@@ -83,34 +85,62 @@ QImage &alg::Line::bresenhamPath(QImage *img)
 {
     //Bresenham alghoritm works asssuming coordinates nonequal
     if ((_start_x == _end_x) && (_start_y == _end_y)) {
-        img->setPixel(_start_x, _start_y, _color.rgb());
+        img->setPixel(_start_x, _start_y, _color.rgba());
         return *img;
     }
-    int delta_x = _end_x - _start_x;
-    int delta_y = _end_y - _start_y;
-    int j = _start_y;
-    int epsilon = delta_y - delta_x;
-    if (delta_x > 0){
-        for (uint i = _start_x; i < _end_x; ++i) {
-            delay();
-            img->setPixel(i, j, _color.rgb());
-            if (epsilon >= 0) {
-                ++j;
-                epsilon -= delta_x;
+    uint x1 = _start_x, y1 = _start_y, x2 = _end_x, y2 = _end_y;
+
+    // Bresenham's line algorithm
+    int delta_x(x2 - x1);
+    // if x1 == x2, then it does not matter what we set here
+    signed char const ix((delta_x > 0) - (delta_x < 0));
+    delta_x = std::abs(delta_x) << 1;
+
+    int delta_y(y2 - y1);
+    // if y1 == y2, then it does not matter what we set here
+    signed char const iy((delta_y > 0) - (delta_y < 0));
+    delta_y = std::abs(delta_y) << 1;
+
+    img->setPixel(x1, y1, _color.rgba());
+
+    if (delta_x >= delta_y)
+    {
+        // error may go below zero
+        int error(delta_y - (delta_x >> 1));
+
+        while (x1 != x2)
+        {
+            if ((error >= 0) && (error || (ix > 0)))
+            {
+                error -= delta_x;
+                y1 += iy;
             }
-            //++i;
-            epsilon += delta_y;
+            // else do nothing
+
+            error += delta_y;
+            x1 += ix;
+
+            img->setPixel(x1, y1, _color.rgba());
         }
-    } else {
-        for (uint i = _end_x; i < _start_x; ++i) {
-            delay();
-            img->setPixel(i, j, _color.rgb());
-            if (epsilon >= 0) {
-                ++j;
-                epsilon -= delta_x;
+    }
+    else
+    {
+        // error may go below zero
+        int error(delta_x - (delta_y >> 1));
+
+        while (y1 != y2)
+        {
+            if ((error >= 0) && (error || (iy > 0)))
+            {
+                error -= delta_y;
+                x1 += ix;
             }
-            //++i;
-            epsilon += delta_y;
+            // else do nothing
+
+            error += delta_x;
+            y1 += iy;
+
+            img->setPixel(x1, y1, _color.rgba());
         }
     }
     return *img;
@@ -119,11 +149,11 @@ QImage &alg::Line::bresenhamPath(QImage *img)
 QImage &alg::Line::ddaPath(QImage *img)
 {
     if ((_start_x == _end_x) && (_start_y == _end_y)) {
-        img->setPixel(_start_x, _start_y, _color.rgb());
+        img->setPixel(_start_x, _start_y, _color.rgba());
         return *img;
     }
-    int delta_x=_end_x - _start_x;
-    int delta_y=_end_y-_start_y;
+    int delta_x =_end_x - _start_x;
+    int delta_y =_end_y-_start_y;
     qreal x=_start_x, y=_start_y;
     int steps;
     if(qAbs(delta_x) > qAbs(delta_y)) {
@@ -131,15 +161,15 @@ QImage &alg::Line::ddaPath(QImage *img)
     } else {
         steps=qAbs(delta_y);
     }
-    qreal x_increment=delta_x/static_cast<float>(steps);
+    qreal x_increment= delta_x/static_cast<float>(steps);
     qreal y_increment= delta_y/static_cast<float>(steps);
 
-    img->setPixel(qRound(x),qRound(y),_color.rgb());
+    img->setPixel(qRound(x),qRound(y),_color.rgba());
     for(int k=0; k<steps; k++) {
         x += x_increment;
         y += y_increment;
-        delay();
-        img->setPixel(qRound(x),qRound(y),_color.rgb());
+
+        img->setPixel(qRound(x),qRound(y),_color.rgba());
     }
     return *img;
 }
@@ -159,7 +189,7 @@ QImage &alg::Line::wuPath(QImage *img)
         /* Horizontal line */
         while (dx-- != 0) {
             ++x0;
-            img->setPixel(x0, y0, _color.rgb());
+            img->setPixel(x0, y0, _color.rgba());
         }
         return *img;
     }
@@ -167,7 +197,7 @@ QImage &alg::Line::wuPath(QImage *img)
         /* Vertical line */
         do {
             ++y0;
-            img->setPixel(x0, y0, _color.rgb());
+            img->setPixel(x0, y0, _color.rgba());
         } while (--dy != 0);
         return *img;
     }
@@ -176,22 +206,20 @@ QImage &alg::Line::wuPath(QImage *img)
         do {
             ++x0;
             ++y0;
-            img->setPixel(x0, y0, _color.rgb());
+            img->setPixel(x0, y0, _color.rgba());
         } while (--dy != 0);
         return *img;
     }
-
     if (dx > dy)
     {
+        /* x major */
         if (x0 > x1)
         {
             qSwap(x0, x1);
             qSwap(y0, y1);
         }
-        //delay();
-        img->setPixel(_start_x, _start_y, _color.rgb());
-        //delay();
-        img->setPixel(_end_x, _end_y, _color.rgb());
+        img->setPixel(_start_x, _start_y, _color.rgba());
+        img->setPixel(_end_x, _end_y, _color.rgba());
         int slope = y1 > y0 ? 1: -1;
         qreal gradient = slope * (dy / dx);
         qreal y = y0 + gradient;
@@ -201,22 +229,19 @@ QImage &alg::Line::wuPath(QImage *img)
             QColor color_bottom = _color;
             color_top.setAlphaF(1 - y + qFloor(y));
             color_bottom.setAlphaF(y - qFloor(y));
-
             img->setPixel(x, qFloor(y), color_bottom.rgba());
             img->setPixel(x, qFloor(y) + 1, color_top.rgba());
-
             y += gradient;
         }
     } else {
+        /* y major */
         if (y0 > y1)
         {
             qSwap(x0, x1);
             qSwap(y0, y1);
         }
-        //delay();
-        img->setPixel(_start_x, _start_y, _color.rgb());
-        //delay();
-        img->setPixel(_end_x, _end_y, _color.rgb());
+        img->setPixel(_start_x, _start_y, _color.rgba());
+        img->setPixel(_end_x, _end_y, _color.rgba());
         int slope = x1 > x0 ? 1: -1;
         qreal gradient = slope * (dx / dy);
         qreal x = x0 + gradient;
