@@ -6,19 +6,25 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>560</width>
-    <height>555</height>
+    <width>547</width>
+    <height>574</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <widget class="QOpenGLWidget" name="openGLWidget">
+    <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
+     <widget class="QGraphicsView" name="graphicsView">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -32,11 +38,27 @@
      </widget>
     </item>
     <item>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <property name="sizeType">
+       <enum>QSizePolicy::Preferred</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QComboBox" name="alghoritmsSelectorComboBox">
+       <widget class="QComboBox" name="algorithmSelectorComboBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -50,32 +72,12 @@
         <property name="toolTip">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Alghoritm selector&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
-        <item>
-         <property name="text">
-          <string>Xiaolin's Wu</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Bresenham (lines)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Bresenham (circle)</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>DDA</string>
-         </property>
-        </item>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="timeTaken">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -109,6 +111,12 @@
       </item>
       <item>
        <widget class="QDialogButtonBox" name="buttonBox">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="standardButtons">
          <set>QDialogButtonBox::Close</set>
         </property>
