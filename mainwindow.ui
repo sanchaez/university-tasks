@@ -75,7 +75,17 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="testCheckBox">
+        <property name="text">
+         <string>9000 test</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="timeTaken">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -137,12 +147,28 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>527</x>
-     <y>255</y>
+     <x>536</x>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
      <x>561</x>
      <y>256</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>testCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>timeTaken</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>203</x>
+     <y>552</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>549</y>
     </hint>
    </hints>
   </connection>

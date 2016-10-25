@@ -29,6 +29,7 @@ public:
 public slots:
     void update_image();
     void update_on_index_change(int index);
+    void update_1000_test_current_index(bool state);
 private:
     Ui::MainWindow *ui;
     QImage *image;

@@ -9,6 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
     image(new QImage(100, 100, QImage::Format_ARGB32_Premultiplied))
 {
     ui->setupUi(this);
+    ui->timeTaken->setVisible(false);
     scene = new QGraphicsScene(this);
     //setup view
     auto scaled_image = image->scaled(100 * alg::Shape::getScaleFactor(), 100 * alg::Shape::getScaleFactor());
@@ -24,9 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
         ui->algorithmSelectorComboBox->insertItem(x, e.valueToKey(static_cast<Algorithm>(x)));
     }
     update_on_index_change(0);
-    //connect update signal
+    //connect update signals
     connect(ui->algorithmSelectorComboBox, SIGNAL(activated(int)),
             this, SLOT(update_on_index_change(int)));
+    connect(ui->testCheckBox, SIGNAL(toggled(bool)),
+            this, SLOT(update_1000_test_current_index(bool)));
 }
 
 MainWindow::~MainWindow()
@@ -37,31 +40,75 @@ MainWindow::~MainWindow()
 
 void MainWindow::update_on_index_change(int index)
 {
-    QElapsedTimer timer;
+    if (ui->testCheckBox->checkState() == Qt::Checked) {
+        update_1000_test_current_index(true);
+    }
+
     image->fill(Qt::black);
     switch(static_cast<MainWindow::Algorithm>(index)) {
     case MainWindow::DDA:
-        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.ddaPath(image);
         }
         break;
     case MainWindow::Bresenham_lines:
-        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.bresenhamPath(image);
         }
         break;
     case MainWindow::Bresenham_circles:
-        timer.start();
         foreach(auto x, alg::demo_circles) {
             x.bresenhamPath(image);
         }
         break;
     case MainWindow::Wu:
-        timer.start();
         foreach(auto x, alg::demo_surname) {
             x.wuPath(image);
+        }
+        break;
+    }
+    update_image();
+}
+
+void MainWindow::update_1000_test_current_index(bool state)
+{
+    int index = ui->algorithmSelectorComboBox->currentIndex();
+    if(!state) {
+        update_on_index_change(index);
+    }
+    QElapsedTimer timer;
+    const int number_of_tests = 9000;
+    switch(static_cast<MainWindow::Algorithm>(index)) {
+    case MainWindow::DDA:
+        timer.start();
+        for(int i = 0; i < number_of_tests; ++i) {
+            foreach(auto x, alg::demo_surname) {
+                x.ddaPath(image);
+            }
+        }
+
+        break;
+    case MainWindow::Bresenham_lines:
+        timer.start();
+        for(int i = 0; i < number_of_tests; ++i) {
+            foreach(auto x, alg::demo_surname) {
+                x.bresenhamPath(image);
+            }}
+        break;
+    case MainWindow::Bresenham_circles:
+        timer.start();
+        for(int i = 0; i < number_of_tests; ++i) {
+            foreach(auto x, alg::demo_circles) {
+                x.bresenhamPath(image);
+            }
+        }
+        break;
+    case MainWindow::Wu:
+        timer.start();
+        for(int i = 0; i < number_of_tests; ++i) {
+            foreach(auto x, alg::demo_surname) {
+                x.wuPath(image);
+            }
         }
         break;
     }
