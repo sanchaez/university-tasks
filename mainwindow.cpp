@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->timeTaken->setVisible(false);
+    ui->testSpinBox->setVisible(false);
     scene = new QGraphicsScene(this);
     //setup view
     auto scaled_image = image->scaled(100 * alg::Shape::getScaleFactor(), 100 * alg::Shape::getScaleFactor());
@@ -29,7 +30,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->algorithmSelectorComboBox, SIGNAL(activated(int)),
             this, SLOT(update_on_index_change(int)));
     connect(ui->testCheckBox, SIGNAL(toggled(bool)),
-            this, SLOT(update_1000_test_current_index(bool)));
+            this, SLOT(update_test_current_index(bool)));
+    connect(ui->updateButton, SIGNAL(clicked()),
+            this, SLOT(update_test_current_index_current_test()));
+
 }
 
 MainWindow::~MainWindow()
@@ -41,7 +45,7 @@ MainWindow::~MainWindow()
 void MainWindow::update_on_index_change(int index)
 {
     if (ui->testCheckBox->checkState() == Qt::Checked) {
-        update_1000_test_current_index(true);
+        update_test_current_index(true);
     }
 
     image->fill(Qt::black);
@@ -70,14 +74,14 @@ void MainWindow::update_on_index_change(int index)
     update_image();
 }
 
-void MainWindow::update_1000_test_current_index(bool state)
+void MainWindow::update_test_current_index(bool state)
 {
     int index = ui->algorithmSelectorComboBox->currentIndex();
     if(!state) {
         update_on_index_change(index);
     }
     QElapsedTimer timer;
-    const int number_of_tests = 9000;
+    const int number_of_tests = ui->testSpinBox->value();
     switch(static_cast<MainWindow::Algorithm>(index)) {
     case MainWindow::DDA:
         timer.start();
@@ -112,8 +116,13 @@ void MainWindow::update_1000_test_current_index(bool state)
         }
         break;
     }
-    ui->timeTaken->setText(QString("Time taken: %1 msec").arg(timer.elapsed()));
+    ui->timeTaken->setText(QString("Time: %1 msec").arg(timer.elapsed()));
     update_image();
+}
+
+void MainWindow::update_test_current_index_current_test()
+{
+    update_test_current_index(ui->testCheckBox->checkState() == Qt::Checked ? true : false);
 }
 
 void MainWindow::update_image()

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>547</width>
-    <height>574</height>
+    <width>637</width>
+    <height>571</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -77,32 +77,7 @@
       <item>
        <widget class="QCheckBox" name="testCheckBox">
         <property name="text">
-         <string>9000 test</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="timeTaken">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time that takes an alghoritm to complete computations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Time taken: </string>
+         <string>Test</string>
         </property>
        </widget>
       </item>
@@ -120,15 +95,76 @@
        </spacer>
       </item>
       <item>
-       <widget class="QDialogButtonBox" name="buttonBox">
+       <widget class="QSpinBox" name="testSpinBox">
+        <property name="suffix">
+         <string> cycles</string>
+        </property>
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="minimum">
+         <number>1000</number>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+        <property name="singleStep">
+         <number>100</number>
+        </property>
+        <property name="value">
+         <number>9000</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="timeTaken">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="standardButtons">
-         <set>QDialogButtonBox::Close</set>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time that takes an alghoritm to complete computations&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Time:  0 ms</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="updateButton">
+        <property name="text">
+         <string>Update</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="exitButton">
+        <property name="text">
+         <string>Exit</string>
         </property>
        </widget>
       </item>
@@ -141,34 +177,50 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>536</x>
-     <y>563</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>561</x>
-     <y>256</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>testCheckBox</sender>
    <signal>toggled(bool)</signal>
    <receiver>timeTaken</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>203</x>
-     <y>552</y>
+     <x>207</x>
+     <y>536</y>
     </hint>
     <hint type="destinationlabel">
-     <x>280</x>
-     <y>549</y>
+     <x>595</x>
+     <y>542</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>testCheckBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>testSpinBox</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>201</x>
+     <y>543</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>385</x>
+     <y>529</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>exitButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>802</x>
+     <y>533</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>773</x>
+     <y>438</y>
     </hint>
    </hints>
   </connection>

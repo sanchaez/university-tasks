@@ -5,14 +5,6 @@
 #include <QEventLoop>
 #include <QtAlgorithms>
 
-//delay is used to show practical difference between algorithms
-void delay()
-{
-    QTime dieTime= QTime::currentTime().addMSecs(5);
-    while (QTime::currentTime() < dieTime)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
-
 alg::Circle::Circle(const uint x, const uint y, const uint radius)
 {
     _x = x;
