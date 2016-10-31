@@ -1,5 +1,23 @@
 #pragma once
+#include <vector>
 
-void graph1();
+class CosTaylorSeries {
+public:
+	CosTaylorSeries() = default;
+	double calculate(const double& x, const double& eps);
+	double calculate_n(const double& x, const int& length);
 
-void graph2();
+	double get_rest() const { return rest; }
+	int get_n() const { return n; }
+	double get_result() const { return result; }
+
+protected:
+	double _fn_u(const double& x, const int& k);
+	int n;
+	double rest;
+	double result;
+	std::vector<double> last_u;
+
+};
+
+double power(const double& value, const int& pow);
