@@ -1,7 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include "math_accuracy.h"
-//cos x; [-31.3; -4.9]
+//cos x; [6.8; 34.9]
 const double a = 6.8;
 const double b = 34.9;
 
@@ -24,6 +24,8 @@ void main(void)
 	const int int_width = 10;
 
 	CosTaylorSeries series;
+	std::cout	<< "Lab1 : CAM : Function calculus" << std::endl
+				<< ":Test 1 :" << std::endl << std::endl;
 	print_element(":eps", width);
 	print_element(":n", int_width);
 	print_element(":abs error", width);
@@ -44,7 +46,8 @@ void main(void)
 		print_element(series.get_rest(), width);
 		std::cout << std::endl;
 	}
-	std::cout << std::endl;
+	std::cout << std::endl
+		<< ":Test 2 :" << std::endl << std::endl;
 	//2
 	double x_i = 0.0;
 	const double h = (b - a) / 10.;
@@ -60,5 +63,8 @@ void main(void)
 		print_element(series.get_rest(), width);
 		std::cout << std::endl;
 	}
+	std::cout << std::endl
+		<< "Press ENTER...";
+	std::cout << std::endl;
 	std::cin.get();
 }
