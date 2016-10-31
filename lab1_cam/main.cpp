@@ -24,7 +24,7 @@ void main(void)
 	const int int_width = 10;
 
 	CosTaylorSeries series;
-	std::cout	<< "Lab1 : CAM : Function calculus" << std::endl << std::endl
+	std::cout	<< "Lab1 : CAM : Function calculus : cos(x) : [6.8; 34.9] :" << std::endl << std::endl
 				<< ":Test 1 :" << std::endl << std::endl;
 	print_element(":eps", width);
 	print_element(":n", int_width);
