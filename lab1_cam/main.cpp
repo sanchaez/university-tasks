@@ -19,7 +19,6 @@ template<typename T> void print_row_plot2(T x_i, T abs_error, T rest)
 
 void main(void) 
 {
-	int n_8 = 0;
 	const double x = (b + a) / 2.;
 	const int width = 20;
 	const int int_width = 10;
@@ -31,9 +30,11 @@ void main(void)
 	print_element(":rest", width);
 	std::cout << std::endl;
 	//1
-	for (double eps = 1e-2; eps > 1e-14; eps -= 1e-3) {
+	int n_8 = 0;
+	for (int i = -2; i > -14; i += -3) {
+		double eps = power(10, i);
 		series.calculate(x, eps);
-		if (eps == 1e-8) {
+		if (eps >= 1e-8) {
 			n_8 = series.get_n();
 		}
 

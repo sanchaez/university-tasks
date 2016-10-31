@@ -8,7 +8,7 @@ double power(const double& value, const int& pow) {
 
 	double result = 1.0;
 	if (pow < 0) {
-		for (int i = 0; i < pow; ++i) {
+		for (int i = 0; i > pow; --i) {
 			result /= value;
 		}
 
@@ -23,50 +23,37 @@ double power(const double& value, const int& pow) {
 
 double CosTaylorSeries::calculate(const double& x, const double& eps)
 {
-	double x_floored = abs(x);
-	while (x_floored > M_PI / 2.) {
-		x_floored -= M_PI / 2.;
-	}
-	x_floored = M_PI / 2. - x_floored;
-	result = 0.0;
-	last_u.push_back(_fn_u(x_floored, 1));
-	n = 1;
-	while (fabs(last_u[n - 1]) >= eps) {
-		result += last_u[n - 1];
-		++n;
-		last_u.push_back(_fn_u(x_floored, n));
-	}
-	//last_u eventually becomes Rn
-	result += last_u[n - 1];
-	rest = last_u[n - 1];
-	last_u.clear();
-	return result;
+	return _fn_u(x, 1, 1, eps);
 }
 
 double CosTaylorSeries::calculate_n(const double& x, const int& length)
-{
-	double x_floored = abs(x);
-	while (x_floored > M_PI / 2.) {
-		x_floored -= M_PI / 2.;
-	}
-	x_floored = M_PI / 2. - x_floored;
-	result = 0.0;
-	last_u.push_back(_fn_u(x_floored, 1));
-	n = 1;
-	while (n <= length) {
-		result += last_u[n - 1];
-		++n;
-		last_u.push_back(_fn_u(x_floored, n));
-	}
-	//last_u eventually becomes Rn
-	result += last_u[n - 1];
-	rest = last_u[n - 1];
-	last_u.clear();
-	return result;
+{	
+	return _fn_n(x, 1, 1, length);
 }
 
-double CosTaylorSeries::_fn_u(const double& x, const int& k)
+double CosTaylorSeries::_fn_u(const double& x, const int& k, const double& prev, const double& eps)
 {
-	if (k == 1) return x;
-	return -((power(x, 2) * last_u[k - 2]) / static_cast<double>( 2 * k * (2 * k - 1)));
+	double next = - (prev * x * x )/ (2 * k * (2 * k - 1));
+	n = k;
+	if (fabs(next) < eps) {
+		rest = next;
+		return prev + next;
+	} else {
+		result = prev + _fn_u(x, k + 1, next, eps);
+		return result;
+	}
 }
+
+double CosTaylorSeries::_fn_n(const double & x, const int & k, const double & prev, const int & length)
+{
+	double next = -(prev * x * x) / (2 * k * (2 * k - 1));
+	n = k;
+	if (k > length) {
+		rest = next;
+		return prev + next;
+	} else {
+		result = prev + _fn_n(x, k + 1, next, length);
+		return result;
+	}
+}
+
