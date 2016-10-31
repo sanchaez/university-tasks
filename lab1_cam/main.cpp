@@ -24,7 +24,7 @@ void main(void)
 	const int int_width = 10;
 
 	CosTaylorSeries series;
-	std::cout	<< "Lab1 : CAM : Function calculus" << std::endl
+	std::cout	<< "Lab1 : CAM : Function calculus" << std::endl << std::endl
 				<< ":Test 1 :" << std::endl << std::endl;
 	print_element(":eps", width);
 	print_element(":n", int_width);
@@ -42,8 +42,8 @@ void main(void)
 
 		print_element(eps, width);
 		print_element(series.get_n(), int_width);
-		print_element(series.get_result() - cos(x), width);
-		print_element(series.get_rest(), width);
+		print_element(fabs(series.get_result() - cos(x)), width);
+		print_element(fabs(series.get_rest()), width);
 		std::cout << std::endl;
 	}
 	std::cout << std::endl
@@ -59,8 +59,8 @@ void main(void)
 		x_i = a + h*i;
 		series.calculate_n(x_i, n_8);
 		print_element(x_i, width);
-		print_element(series.get_result() - cos(x_i), width);
-		print_element(series.get_rest(), width);
+		print_element(fabs(series.get_result() - cos(x_i)), width);
+		print_element(fabs(series.get_rest()), width);
 		std::cout << std::endl;
 	}
 	std::cout << std::endl
