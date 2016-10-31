@@ -10,13 +10,6 @@ template<typename T> void print_element(T t, const int& width)
 	std::cout << std::left << std::setw(width) << std::setfill(' ') << t;
 }
 
-
-template<typename T> void print_row_plot2(T x_i, T abs_error, T rest)
-{
-	const int width = 10;
-
-}
-
 void main(void) 
 {
 	const double x = (b + a) / 2.;
