@@ -24,7 +24,7 @@ double power(const double& value, const int& pow) {
 double CosTaylorSeries::calculate(const double& x, const double& eps)
 {
 	double x_floored = fabs(x);
-	while (x_floored > 2 * M_PI) {
+	while (x_floored >= 2 * M_PI) {
 		x_floored -= 2 * M_PI;
 	}
 	return _fn_u(x_floored, 1, 1, eps);
@@ -33,7 +33,7 @@ double CosTaylorSeries::calculate(const double& x, const double& eps)
 double CosTaylorSeries::calculate_n(const double& x, const int& length)
 {	
 	double x_floored = fabs(x);
-	while (x_floored > 2 * M_PI) {
+	while (x_floored >= 2 * M_PI) {
 		x_floored -= 2 * M_PI;
 	}
 	return _fn_n(x_floored, 1, 1, length);
