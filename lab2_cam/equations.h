@@ -6,16 +6,19 @@ namespace eq {
 	class Equation {
 	public:
 		Equation() = delete;
-		explicit Equation(const FuncType *func_default, const FuncType *derivative_default);
+		explicit Equation(const FuncType func_default, 
+					      const FuncType derivative_default, 
+						  double range_low, double range_high);
 		double operator()(double x);
 		double derivative(double x);
 		double iterative(double x, double accuracy);
 		double hordes(double x, double accuracy);
+		double get_iterations();
 	private:
 		double lambda();
-		const FuncType *_func, *_derivative;
-		static const double range_a = 0;
-		static const double range_b = 1;
+		const FuncType _func, _derivative;
+		double _range_a;
+		double _range_b;
 		int _iterations_count;
 	};
 }
