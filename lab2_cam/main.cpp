@@ -12,7 +12,8 @@ double derivative(double x) {
 }
 
 void main(void) {
-	eq::Equation<double(*)(double)> equations(&fn, &derivative, 0, 1);
-	std::cout << equations(5) << fn(5);
+	eq::Equation<double(double)> equations(&fn, &derivative, 0, 1);
+	std::cout << std::setw(10) << equations(5)
+		<<std::setw(10) << fn(5);
 	std::cin.get();
 }
