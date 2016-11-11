@@ -49,7 +49,7 @@ void do_test(eq::Equation<double(double)> &test_equation_object) {
 	std::cout << "Test 2: Hordes" << std::endl;
 	print_table_single_test(test_equation_object, &eq::Equation<double(double)>::hordes);
 	//iterations comparison test
-	std::cout << "Test 3: Iterations comparison" <<  std::endl;
+	std::cout << "Test 3: Iterations comparison" << std::endl;
 	print_table_iterations_test(test_equation_object);
 }
 
@@ -59,7 +59,7 @@ void main(void) {
 	eq::Equation<double(double)> equation(&fn, &derivative, 0.0001, 0.01);
 	do_test(equation);
 
-	//Second test 
+	//Second test
 	std::cout << ": Second root :" << std::endl;
 	equation.set_range(5, 7);
 	do_test(equation);

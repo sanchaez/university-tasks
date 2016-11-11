@@ -6,9 +6,9 @@ namespace eq {
 	class Equation {
 	public:
 		Equation() = delete;
-		explicit Equation(FuncType func_default, 
-					      FuncType derivative_default, 
-						  const double& range_low, const double& range_high)
+		explicit Equation(FuncType func_default,
+			FuncType derivative_default,
+			const double& range_low, const double& range_high)
 		{
 			_func = func_default;
 			_derivative = derivative_default;
@@ -17,10 +17,10 @@ namespace eq {
 		}
 		double	operator()(const double& x) { return _func(x); }
 		double	derivative(const double& x) { return _derivative(x); }
-		int		get_last_iterations()	const	{ return _iterations_count;	}
+		int		get_last_iterations()	const { return _iterations_count; }
 		void set_range(const double &a, const double &b) { _range_a = a; _range_b = b; }
 		double get_range_a() const { return _range_a; }
-		double get_range_b() const { return _range_b;  }
+		double get_range_b() const { return _range_b; }
 		//
 		double iterative(const double& precision) {
 			const double lambda_constant = lambda_factor();
@@ -29,7 +29,7 @@ namespace eq {
 			std::function<double(double)> phi_function([&](double x) { return x - lambda_constant * _func(x); });
 
 			const double precision_constant = abs((1 - q_constant) / q_constant * precision);
-			double x0 = (_range_b - _range_a) / 1.7, 
+			double x0 = (_range_b - _range_a) / 1.7,
 				xn = phi_function(x0);
 			_iterations_count = 0;
 			while (abs(xn - x0) > precision_constant) {
@@ -57,15 +57,15 @@ namespace eq {
 		}
 	private:
 		double min_derivative_range() {
-			double min_a = _derivative(_range_a), 
+			double min_a = _derivative(_range_a),
 				min_b = _derivative(_range_b);
 			return (min_a <= min_b) ? min_a : min_b;
 		}
 
 		double max_derivative_range() {
-			double max_a = _derivative(_range_a), 
+			double max_a = _derivative(_range_a),
 				max_b = _derivative(_range_b);
-			return (max_a >= max_b) ? max_a :  max_b;
+			return (max_a >= max_b) ? max_a : max_b;
 		}
 
 		double lambda_factor() {
