@@ -1,7 +1,7 @@
 #include <iostream>
-#include <iomanip>
-#include <initializer_list>
+#include "print_helpers.h"
 #include "equations.h"
+
 //20: ln(x)- x + 5=0; I, H
 //[a, b] = [0, 1]
 
@@ -13,19 +13,6 @@ double derivative(double x) {
 	return 1 / x - 1;
 }
 
-
-template <class T> 
-inline void fixed_width_print_obj(T obj, const int& width = 15, const int& precision = 15) {
-	std::cout << std::left << std::setw(width) << std::setprecision(precision) << obj;
-}
-
-template <class T> 
-void fixed_width_print_line(std::initializer_list<T> list, const int& width = 15) {
-	for (T obj : list) {
-		fixed_width_print_obj<T>(obj, width);
-	}
-	std::cout << std::endl;
-}
 typedef double (eq::Equation<double(double)>::*EquationMemberFunction)(const double &);
 
 inline void print_table_single_test(eq::Equation<double(double)> &test_equation_object, EquationMemberFunction test_function) {
