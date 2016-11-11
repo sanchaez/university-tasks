@@ -15,9 +15,9 @@ namespace eq {
 			_range_a = range_low;
 			_range_b = range_high;
 		}
-		double operator()(const double& x) { return _func(x); }
-		double derivative(const double& x) { return _derivative(x); }
-		double get_iterations()		{ return _iterations_count;	}
+		double	operator()(const double& x) { return _func(x); }
+		double	derivative(const double& x) { return _derivative(x); }
+		int		get_last_iterations()	const	{ return _iterations_count;	}
 		//
 		double iterative(const double& precision) {
 			const double lambda_constant = lambda_factor();
@@ -25,23 +25,37 @@ namespace eq {
 
 			std::function<double(double)> phi_function;
 			if (lambda_constant < 0) {
-				phi_function = [&](double x)->double { return x - lambda_constant * _func(x); };
+				phi_function = [&](double x) { return x - lambda_constant * _func(x); };
 			}
 			else {
-				phi_function = [&](double x)->double { return x + lambda_constant * _func(x); };
+				phi_function = [&](double x) { return x + lambda_constant * _func(x); };
 			}
+
 			const double precision_constant = abs((1 - q_constant) / q_constant * precision);
-			double x0 = (_range_b - _range_a) / 1.7, xn = phi_function(x0);
-			double dbg = abs(xn - x0);
+			double x0 = (_range_b - _range_a) / 1.7, 
+				xn = phi_function(x0);
+			_iterations_count = 0;
 			while (abs(xn - x0) > precision_constant) {
 				x0 = xn;
 				xn = phi_function(xn);
+				++_iterations_count;
 			};
 			return xn;
 		}
 
-		double hordes(const double& accuracy) {
-			return 0.0;
+		double hordes(const double& precision) {
+			std::function<double(double, double)> iteration_function = \
+				[&](double x, double c) { return x - (_func(x) * (x - c)) / (_func(x) - _func(c)); };
+			double x0 = _range_b,
+				xn = iteration_function(_range_b, _range_a);
+			const double min_derivative_range_constant = min_derivative_range();
+			_iterations_count = 0;
+			while (abs(_func(xn) / min_derivative_range_constant) > precision) {
+				x0 = xn;
+				xn = iteration_function(xn, _range_b);
+				++_iterations_count;
+			}
+			return xn;
 		}
 	private:
 		double min_derivative_range() {
