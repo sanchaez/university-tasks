@@ -18,18 +18,15 @@ namespace eq {
 		double	operator()(const double& x) { return _func(x); }
 		double	derivative(const double& x) { return _derivative(x); }
 		int		get_last_iterations()	const	{ return _iterations_count;	}
+		void set_range(const double &a, const double &b) { _range_a = a; _range_b = b; }
+		double get_range_a() const { return _range_a; }
+		double get_range_b() const { return _range_b;  }
 		//
 		double iterative(const double& precision) {
 			const double lambda_constant = lambda_factor();
 			const double q_constant = q_factor();
 
-			std::function<double(double)> phi_function;
-			if (lambda_constant < 0) {
-				phi_function = [&](double x) { return x - lambda_constant * _func(x); };
-			}
-			else {
-				phi_function = [&](double x) { return x + lambda_constant * _func(x); };
-			}
+			std::function<double(double)> phi_function([&](double x) { return x - lambda_constant * _func(x); });
 
 			const double precision_constant = abs((1 - q_constant) / q_constant * precision);
 			double x0 = (_range_b - _range_a) / 1.7, 
@@ -44,8 +41,9 @@ namespace eq {
 		}
 
 		double hordes(const double& precision) {
-			std::function<double(double, double)> iteration_function = \
-				[&](double x, double c) { return x - (_func(x) * (x - c)) / (_func(x) - _func(c)); };
+			std::function<double(double, double)> iteration_function(\
+				[&](double x, double c) { return x - (_func(x) * (x - c)) / (_func(x) - _func(c)); });
+
 			double x0 = _range_b,
 				xn = iteration_function(_range_b, _range_a);
 			const double min_derivative_range_constant = min_derivative_range();
