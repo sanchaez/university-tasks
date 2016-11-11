@@ -3,7 +3,7 @@
 #include "equations.h"
 
 //20: ln(x)- x + 5=0; I, H
-//[a, b] = [0, 1]
+//[a, b] = [5, 7]
 
 double fn(double x) {
 	return log(x) - x + 5;
@@ -39,16 +39,30 @@ inline void print_table_iterations_test(eq::Equation<double(double)> &test_equat
 	std::cout << std::endl;
 };
 
-void main(void) {
-	eq::Equation<double(double)> equations(&fn, &derivative, 5, 7);
+void do_test(eq::Equation<double(double)> &test_equation_object) {
 	//iterative test results
+	std::cout << ": Range [" << test_equation_object.get_range_a() << ","
+		<< test_equation_object.get_range_b() << "]" << std::endl << std::endl;
 	std::cout << "Test 1: Iterative" << std::endl;
-	print_table_single_test(equations, &eq::Equation<double(double)>::iterative);
+	print_table_single_test(test_equation_object, &eq::Equation<double(double)>::iterative);
 	//hordes test results
 	std::cout << "Test 2: Hordes" << std::endl;
-	print_table_single_test(equations, &eq::Equation<double(double)>::hordes);
+	print_table_single_test(test_equation_object, &eq::Equation<double(double)>::hordes);
 	//iterations comparison test
 	std::cout << "Test 3: Iterations comparison" <<  std::endl;
-	print_table_iterations_test(equations);
+	print_table_iterations_test(test_equation_object);
+}
+
+void main(void) {
+	//First test
+	std::cout << ": First root :" << std::endl;
+	eq::Equation<double(double)> equation(&fn, &derivative, 0.0001, 0.01);
+	do_test(equation);
+
+	//Second test 
+	std::cout << ": Second root :" << std::endl;
+	equation.set_range(5, 7);
+	do_test(equation);
+
 	std::cin.get();
 }
