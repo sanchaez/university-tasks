@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     graphicsbezieritem.cpp
 
 HEADERS  += \
-    controlitem.h \
     graphicsbezieritem.h
 
 FORMS    +=
