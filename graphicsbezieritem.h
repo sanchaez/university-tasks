@@ -4,6 +4,7 @@
 #include <QGraphicsItem>
 #include <QPen>
 #include <QVector>
+#include <QLinkedList>
 #include "controlitem.h"
 
 class GraphicsBezierItem : public QGraphicsItem
@@ -18,7 +19,7 @@ public:
     void removeControl(int num);
 
     const QVector<QPointF> &getControls() const;
-    const QVector<QPointF>& getCurve() const;
+    const QVector<QPointF> &getCurve() const;
 
     float getPrecision() const;
     void setPrecision(float value);
@@ -39,7 +40,7 @@ private:
 
     void update();
     void updateRect();
-    QPointF singleCurvePoint(QVector<QPointF> points, qreal parameter_t);
+    QPointF singleCurvePoint(const QVector<QPointF> &points, const qreal &parameter_t);
 };
 
 #endif // GRAPHICSBEZIERITEM_H

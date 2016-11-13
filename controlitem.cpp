@@ -16,19 +16,18 @@ ControlItem::ControlItem(QGraphicsItem *parent) :
 ControlItem::ControlItem(QGraphicsItem *parent, int size) :
     QGraphicsItem(parent),
     _size(size),
-    _pen(Qt::gray, 2, Qt::SolidLine, Qt::RoundCap),
-    _pos(0,0)
+    _pen(Qt::gray, 2, Qt::SolidLine, Qt::RoundCap)
 {
+    setPos(QPointF(0,0));
     setAcceptHoverEvents(true);
     setAcceptedMouseButtons(Qt::MouseButton::LeftButton);
     setCursor(QCursor(Qt::PointingHandCursor));
 }
 
-ControlItem::ControlItem(QGraphicsItem *parent, QPointF pos) :
-    QGraphicsItem(parent),
-    _pos(pos)
+ControlItem::ControlItem(QGraphicsItem *parent, QPointF &pos) :
+    QGraphicsItem(parent)
 {
-
+    setPos(pos);
 }
 
 QRectF ControlItem::boundingRect() const {

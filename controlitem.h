@@ -10,7 +10,7 @@ public:
     ControlItem();
     ControlItem(QGraphicsItem *parent);
     ControlItem(QGraphicsItem *parent, int size);
-    ControlItem(QGraphicsItem *parent, QPointF pos);
+    ControlItem(QGraphicsItem *parent, QPointF &pos);
 
     QRectF boundingRect() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
@@ -19,13 +19,13 @@ public:
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
     int getSize() const;
     void setSize(int value);
 
 private:
     int _size = 5;
     QPen _pen;
-    QPointF _pos;
 };
 
 #endif // CONTROLITEM_H

@@ -41,7 +41,7 @@ void GraphicsBezierItem::setControl(int num, const QPointF &c) {
     update();
 }
 
-const QVector<QPointF>& GraphicsBezierItem::getControls() const {
+const QVector<QPointF> &GraphicsBezierItem::getControls() const {
     return _control_points;
 }
 
@@ -80,9 +80,17 @@ void GraphicsBezierItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
 
 void GraphicsBezierItem::update() {
     _curve_points.clear();
-
+    //alloc space
+    {
+        int new_vector_size = 0;
+        for (qreal t = 0 ; t <= 1 ; t += _precision) {
+            ++new_vector_size;
+        }
+        _curve_points.reserve(new_vector_size);
+    }
+    //calculate points
     for (qreal t = 0 ; t <= 1 ; t += _precision)
-        _curve_points.push_back(singleCurvePoint(_control_points, t));
+        _curve_points.append(singleCurvePoint(_control_points, t));
 
     updateRect();
 }
@@ -103,15 +111,15 @@ void GraphicsBezierItem::updateRect() {
     }
 }
 
-QPointF GraphicsBezierItem::singleCurvePoint(QVector<QPointF> points, qreal parameter_t) {
+QPointF GraphicsBezierItem::singleCurvePoint(const QVector<QPointF> &points, const qreal &parameter_t) {
     QVector<QPointF> recalculated_points;
-    int size = points.size();
-
-    if (size == 1)
+    int point_list_size = points.size();
+    recalculated_points.reserve(point_list_size - 1);
+    if (point_list_size == 1)
         return points[0];
     else {
-        for (int i = 0 ; i < size - 1 ; i++)
-            recalculated_points.push_back((points[i+1] - points[i]) * parameter_t + points[i]);
+        for (int i = 0 ; i < point_list_size - 1 ; i++)
+            recalculated_points.append((points[i+1] - points[i]) * parameter_t + points[i]);
 
         return singleCurvePoint(recalculated_points, parameter_t);
     }
