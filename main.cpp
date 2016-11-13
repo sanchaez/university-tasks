@@ -2,8 +2,12 @@
 #include <QGraphicsEllipseItem>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-
+#include <ctime>
 #include "graphicsbezieritem.h"
+
+int gen_num_floored() {
+    return qrand() % 400;
+}
 
 int main(int argc, char *argv[])
 {
@@ -12,12 +16,15 @@ int main(int argc, char *argv[])
     QGraphicsScene scene;
     QGraphicsView view(&scene);
     scene.setSceneRect(0, 0, 400, 400);
+    view.setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     view.setRenderHints(QPainter::Antialiasing);
     view.show();
-
-    GraphicsBezierItem *gbi = new GraphicsBezierItem(QPointF(50,50), QPointF(350,50));
-    gbi->addControl(QPointF(170,70));
-    gbi->addControl(QPointF(300,300));
+    qsrand(time(0));
+    GraphicsBezierItem *gbi = new GraphicsBezierItem(QPointF(gen_num_floored(), gen_num_floored()),
+                                                     QPointF(gen_num_floored(),gen_num_floored()), 0.01);
+    for(int i = 0; i < 5; ++i) {
+        gbi->addControl(QPointF(gen_num_floored(), gen_num_floored()));
+    }
     scene.addItem(gbi);
 
     return app.exec();

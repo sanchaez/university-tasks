@@ -4,25 +4,33 @@
 #include <QPainter>
 #include <QDebug>
 
+#define DEFAULT_PRECISION 0.05
+
 GraphicsBezierItem::GraphicsBezierItem(QGraphicsItem *parent) :
-    GraphicsBezierItem(QPointF(0,0), QPointF(0,0), parent) {
-}
+    GraphicsBezierItem(QPointF(0,0), QPointF(0,0), DEFAULT_PRECISION, parent) {}
 
 GraphicsBezierItem::GraphicsBezierItem(const QPointF &c1, const QPointF &c2, QGraphicsItem *parent) :
-    QGraphicsItem(parent),
-    _control_points({c1,c2}){
-    update();
-}
+    GraphicsBezierItem(c1, c2, DEFAULT_PRECISION, parent) {}
 
-GraphicsBezierItem::GraphicsBezierItem(const QPointF &c1, const QPointF &c2, float precision, QGraphicsItem *parent) :
+GraphicsBezierItem::GraphicsBezierItem(const QPointF &c1, const QPointF &c2, qreal precision, QGraphicsItem *parent) :
     QGraphicsItem(parent),
-    _control_points({c1,c2}),
-    _precision(precision) {
+    _precision(precision),
+    _curve_pen(Qt::SolidLine),
+    _lines_pen(Qt::DashLine)
+{
+    _curve_pen.setJoinStyle(Qt::RoundJoin);
+    _curve_pen.setWidth(3);
+
+    _lines_pen.setColor(Qt::gray);
+    _lines_pen.setWidth(1);
+    _control_points.reserve(2);
+    _control_points.append(ControlPointItem(c1, this));
+    _control_points.append(ControlPointItem(c2, this));
     update();
 }
 
 void GraphicsBezierItem::addControl(const QPointF &c) {
-    _control_points.append(c);
+    _control_points.append(ControlPointItem(c, this));
     update();
 }
 
@@ -37,12 +45,17 @@ void GraphicsBezierItem::removeControl(int num) {
 
 void GraphicsBezierItem::setControl(int num, const QPointF &c) {
     assert(num < _control_points.size());
-    _control_points[num] = c;
+    _control_points[num].setPos(c);
     update();
 }
 
-const QVector<QPointF> &GraphicsBezierItem::getControls() const {
-    return _control_points;
+const QVector<QPointF> GraphicsBezierItem::getControlPoints() const {
+    QVector<QPointF> converted_points(0);
+    converted_points.reserve(_control_points.size());
+    foreach(const ControlPointItem &item, _control_points) {
+        converted_points.append(item.pos());
+    }
+    return converted_points;
 }
 
 const QVector<QPointF> &GraphicsBezierItem::getCurve() const {
@@ -58,11 +71,29 @@ void GraphicsBezierItem::setPrecision(float value) {
 }
 
 QPen GraphicsBezierItem::getPen() const {
-    return _pen;
+    return _curve_pen;
 }
 
 void GraphicsBezierItem::setPen(const QPen &value) {
-    _pen = value;
+    _curve_pen = value;
+    update();
+}
+
+void GraphicsBezierItem::update()
+{
+    _curve_points.clear();
+    //alloc space
+    {
+        int new_vector_size = 0;
+        for (qreal t = 0 ; t <= 1 ; t += _precision) {
+            ++new_vector_size;
+        }
+        _curve_points.reserve(new_vector_size);
+    }
+    //calculate points
+    QVector<QPointF> control_qpoints(getControlPoints());
+    for (qreal t = 0 ; t <= 1 ; t += _precision)
+        _curve_points.append(singleCurvePointAux(control_qpoints, t));
     updateRect();
 }
 
@@ -74,30 +105,16 @@ void GraphicsBezierItem::paint(QPainter *painter, const QStyleOptionGraphicsItem
     Q_UNUSED(option)
     Q_UNUSED(widget)
     painter->setRenderHint(QPainter::Antialiasing);
-    painter->setPen(_pen);
+    painter->setPen(_curve_pen);
     painter->drawPolyline(_curve_points.data(), _curve_points.size());
-}
-
-void GraphicsBezierItem::update() {
-    _curve_points.clear();
-    //alloc space
-    {
-        int new_vector_size = 0;
-        for (qreal t = 0 ; t <= 1 ; t += _precision) {
-            ++new_vector_size;
-        }
-        _curve_points.reserve(new_vector_size);
-    }
-    //calculate points
-    for (qreal t = 0 ; t <= 1 ; t += _precision)
-        _curve_points.append(singleCurvePoint(_control_points, t));
-
-    updateRect();
+    painter->setPen(_lines_pen);
+    painter->drawPolyline(getControlPoints());
+    //painter->drawRect(_curve_boundaries);
 }
 
 void GraphicsBezierItem::updateRect() {
-    _curve_boundaries.setRect(0,0,0,0);
-
+    prepareGeometryChange();
+    //_curve_boundaries.setRect(0,0,0,0);
     for (QPointF &p : _curve_points) {
         if (p.x() <= _curve_boundaries.left())
             _curve_boundaries.setLeft(p.x());
@@ -110,21 +127,32 @@ void GraphicsBezierItem::updateRect() {
             _curve_boundaries.setBottom(p.y());
     }
 }
+QPointF GraphicsBezierItem::singleCurvePointAux(const QVector<QPointF> &points, const qreal &parameter_t){
+        QVector<QPointF> recalculated_points;
+        int point_list_size = points.size();
+        recalculated_points.reserve(point_list_size - 1);
+        if (point_list_size == 1)
+            return points[0];
+        else {
+            for (int i = 0 ; i < point_list_size - 1 ; i++)
+                recalculated_points.append((points[i+1] - points[i]) * parameter_t + points[i]);
 
-QPointF GraphicsBezierItem::singleCurvePoint(const QVector<QPointF> &points, const qreal &parameter_t) {
-    QVector<QPointF> recalculated_points;
-    int point_list_size = points.size();
-    recalculated_points.reserve(point_list_size - 1);
-    if (point_list_size == 1)
-        return points[0];
-    else {
-        for (int i = 0 ; i < point_list_size - 1 ; i++)
-            recalculated_points.append((points[i+1] - points[i]) * parameter_t + points[i]);
+            return singleCurvePointAux(recalculated_points, parameter_t);
+        }
+}
 
-        return singleCurvePoint(recalculated_points, parameter_t);
-    }
+
+QPointF GraphicsBezierItem::singleCurvePoint(const qreal &parameter_t) {
+
+    return singleCurvePointAux(getControlPoints(), parameter_t);
 }
 
 
 
+
+
+GraphicsBezierItem *ControlPointItem::getBezierCurve() const
+{
+    return _bezier_curve;
+}
 
