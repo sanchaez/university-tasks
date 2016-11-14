@@ -3,7 +3,7 @@
 #include <cassert>
 #include <QPainter>
 #include <QDebug>
-
+#include <QtConcurrent/QtConcurrent>
 #define DEFAULT_PRECISION 0.05
 
 GraphicsBezierItem::GraphicsBezierItem(QGraphicsItem *parent) :
@@ -92,8 +92,16 @@ void GraphicsBezierItem::update()
     }
     //calculate points
     QVector<QPointF> control_qpoints(getControlPoints());
-    for (qreal t = 0 ; t <= 1 ; t += _precision)
-        _curve_points.append(singleCurvePointAux(control_qpoints, t));
+    _curve_points.append(control_qpoints.first());
+    //kids, do not try this at home
+    QVector<QFuture<QPointF>> results_vector;
+    for (qreal t = _precision ; t <= 1-_precision; t += _precision) {
+        results_vector.append(QtConcurrent::run(this, &GraphicsBezierItem::singleCurvePointAux, control_qpoints, t));
+    }
+    foreach(QFuture<QPointF> future_result, results_vector) {
+        _curve_points.append(future_result.result());
+    }
+    _curve_points.append(control_qpoints.last());
     updateRect();
 }
 
@@ -129,16 +137,21 @@ void GraphicsBezierItem::updateRect() {
 }
 QPointF GraphicsBezierItem::singleCurvePointAux(const QVector<QPointF> &points, const qreal &parameter_t){
         QVector<QPointF> recalculated_points;
+        QVector<QPointF> temporary_buffer_points(points);
         int point_list_size = points.size();
-        recalculated_points.reserve(point_list_size - 1);
-        if (point_list_size == 1)
-            return points[0];
-        else {
-            for (int i = 0 ; i < point_list_size - 1 ; i++)
-                recalculated_points.append((points[i+1] - points[i]) * parameter_t + points[i]);
-
-            return singleCurvePointAux(recalculated_points, parameter_t);
+        while (point_list_size > 1) {
+            recalculated_points.clear();
+            recalculated_points.reserve(point_list_size - 1);
+            for (int i = 0 ; i < point_list_size - 1 ; ++i)
+                recalculated_points.append((temporary_buffer_points[i+1] - temporary_buffer_points[i]) * parameter_t
+                        + temporary_buffer_points[i]);
+            --point_list_size;
+            if(point_list_size == 1) return recalculated_points.first();
+            temporary_buffer_points.clear();
+            temporary_buffer_points.reserve(point_list_size);
+            temporary_buffer_points = recalculated_points;
         }
+        return points.first();
 }
 
 
@@ -146,9 +159,6 @@ QPointF GraphicsBezierItem::singleCurvePoint(const qreal &parameter_t) {
 
     return singleCurvePointAux(getControlPoints(), parameter_t);
 }
-
-
-
 
 
 GraphicsBezierItem *ControlPointItem::getBezierCurve() const
