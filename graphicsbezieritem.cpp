@@ -3,7 +3,7 @@
 #include <cassert>
 #include <QPainter>
 #include <QDebug>
-
+#include <QTime>
 #define DEFAULT_PRECISION 0.05
 
 GraphicsBezierItem::GraphicsBezierItem(QGraphicsItem *parent) :
@@ -81,6 +81,8 @@ void GraphicsBezierItem::setPen(const QPen &value) {
 
 void GraphicsBezierItem::update()
 {
+    int start_timer = QTime::currentTime().msecsSinceStartOfDay();
+
     _curve_points.clear();
     //alloc space
     {
@@ -97,6 +99,7 @@ void GraphicsBezierItem::update()
         _curve_points.append(singleCurvePointAux(control_qpoints, t));
     _curve_points.append(control_qpoints.last());
     updateRect();
+    qDebug() << "Elapsed: " << QTime::currentTime().msecsSinceStartOfDay() - start_timer << "\n";
 }
 
 QRectF GraphicsBezierItem::boundingRect() const {
