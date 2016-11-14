@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     qsrand(time(0));
     GraphicsBezierItem *gbi = new GraphicsBezierItem(QPointF(gen_num_floored(), gen_num_floored()),
                                                      QPointF(gen_num_floored(),gen_num_floored()), 0.005);
-    for(int i = 0; i < 20; ++i) {
+    for(int i = 0; i < 50; ++i) {
         gbi->addControl(QPointF(gen_num_floored(), gen_num_floored()));
     }
     scene.addItem(gbi);

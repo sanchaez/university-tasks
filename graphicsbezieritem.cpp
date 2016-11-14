@@ -4,6 +4,7 @@
 #include <functional>
 #include <QPainter>
 #include <QDebug>
+#include <QTime>
 #include <QtConcurrent/QtConcurrent>
 #define DEFAULT_PRECISION 0.05
 
@@ -82,6 +83,7 @@ void GraphicsBezierItem::setPen(const QPen &value) {
 
 void GraphicsBezierItem::update()
 {
+    int start_timer = QTime::currentTime().msecsSinceStartOfDay();
     QVector<QPointF> control_qpoints(getControlPoints());
     QVector<qreal> precision_points;
     _curve_points.clear();
@@ -105,6 +107,7 @@ void GraphicsBezierItem::update()
                                                            this, control_qpoints, std::placeholders::_1)));
     _curve_points.append(control_qpoints.last());
     updateRect();
+        qDebug() << "Elapsed: " << QTime::currentTime().msecsSinceStartOfDay() - start_timer << "\n";
 }
 
 QRectF GraphicsBezierItem::boundingRect() const {
