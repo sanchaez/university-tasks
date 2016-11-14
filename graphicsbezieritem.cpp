@@ -1,6 +1,7 @@
 #include "graphicsbezieritem.h"
 
 #include <cassert>
+#include <functional>
 #include <QPainter>
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
@@ -81,6 +82,8 @@ void GraphicsBezierItem::setPen(const QPen &value) {
 
 void GraphicsBezierItem::update()
 {
+    QVector<QPointF> control_qpoints(getControlPoints());
+    QVector<qreal> precision_points;
     _curve_points.clear();
     //alloc space
     {
@@ -89,18 +92,17 @@ void GraphicsBezierItem::update()
             ++new_vector_size;
         }
         _curve_points.reserve(new_vector_size);
+             precision_points.reserve(new_vector_size);
     }
     //calculate points
-    QVector<QPointF> control_qpoints(getControlPoints());
     _curve_points.append(control_qpoints.first());
-    //kids, do not try this at home
-    QVector<QFuture<QPointF>> results_vector;
     for (qreal t = _precision ; t <= 1-_precision; t += _precision) {
-        results_vector.append(QtConcurrent::run(this, &GraphicsBezierItem::singleCurvePointAux, control_qpoints, t));
+        precision_points.append(t);
     }
-    foreach(QFuture<QPointF> future_result, results_vector) {
-        _curve_points.append(future_result.result());
-    }
+    //kids, do not try this at home
+    _curve_points.append(QtConcurrent::blockingMapped(precision_points,
+                                                 std::bind(&GraphicsBezierItem::singleCurvePointAux,
+                                                           this, control_qpoints, std::placeholders::_1)));
     _curve_points.append(control_qpoints.last());
     updateRect();
 }
