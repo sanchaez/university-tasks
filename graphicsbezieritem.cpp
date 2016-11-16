@@ -6,6 +6,8 @@
 #include <QTime>
 #define DEFAULT_PRECISION 0.05
 
+#define DEFAULT_PRECISION 0.05
+
 GraphicsBezierItem::GraphicsBezierItem(QGraphicsItem *parent) :
     GraphicsBezierItem(QPointF(0,0), QPointF(0,0), DEFAULT_PRECISION, parent) {}
 
