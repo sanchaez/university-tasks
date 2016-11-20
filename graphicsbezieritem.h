@@ -18,6 +18,7 @@ public:
     GraphicsBezierItem(const QPointF &c1, const QPointF &c2, qreal _precision, QGraphicsItem *parent = 0);
 
     void addControl(const QPointF &c);
+    void addControls(const QVector<QPointF> &c);
     void setControl(int num, const QPointF &c);
     void removeControl(int num);
 
@@ -25,7 +26,7 @@ public:
     const QVector<QPointF> &getCurve() const;
 
     float getPrecision() const;
-    void setPrecision(float value);
+    void setPrecision(qreal value);
 
     QPen getPen() const;
     void setPen(const QPen &value);
