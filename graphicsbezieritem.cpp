@@ -36,6 +36,14 @@ void GraphicsBezierItem::addControl(const QPointF &c) {
     update();
 }
 
+void GraphicsBezierItem::addControls(const QVector<QPointF> &c)
+{
+    foreach(QPointF point, c) {
+        _control_points.append(ControlPointItem(point, this));
+    }
+    update();
+}
+
 void GraphicsBezierItem::removeControl(int num) {
     int current_size = _control_points.size();
     if (current_size > 2) { //Bezier curve must contain at least 2 control points
@@ -64,11 +72,11 @@ const QVector<QPointF> &GraphicsBezierItem::getCurve() const {
     return _curve_points;
 }
 
-float GraphicsBezierItem::getPrecision() const {
+qreal GraphicsBezierItem::getPrecision() const {
     return _precision;
 }
 
-void GraphicsBezierItem::setPrecision(float value) {
+void GraphicsBezierItem::setPrecision(qreal value) {
     _precision = value;
 }
 
