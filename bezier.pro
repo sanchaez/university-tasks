@@ -16,9 +16,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     controlitem.cpp \
-    graphicsbezieritem.cpp
+    graphicsbezieritem.cpp \
+    mainwindow.cpp
 
 HEADERS  += \
-    graphicsbezieritem.h
+    graphicsbezieritem.h \
+    mainwindow.h
 
-FORMS    +=
+FORMS    += \
+    mainwindow.ui
