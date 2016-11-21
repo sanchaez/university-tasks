@@ -1,4 +1,3 @@
-
 #include "mainwindow.h"
 
 #ifdef QT_DEBUG
