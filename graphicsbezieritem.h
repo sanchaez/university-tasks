@@ -62,11 +62,11 @@ class GraphicsBezierItem : public QGraphicsItem {
   QPen _curve_pen, _lines_pen;
   qreal _angle, _angle_delta;
   qreal _scale, _scale_delta;
-  QPointF singleCurvePointAux(const QVector<QPointF>& points,
-                              const qreal& parameter_t);
   void updateRect();
   void updateCurveScale();
   void updateCurveAngle();
+  QPointF singleCurvePointAux(QVector<QPointF> buffer,
+                              const qreal& parameter_t);
 };
 
 class ControlPointItem : public QGraphicsItem {

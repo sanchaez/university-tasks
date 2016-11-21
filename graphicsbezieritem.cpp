@@ -223,27 +223,15 @@ void GraphicsBezierItem::updateCurveScale() {
   }
 }
 
-QPointF GraphicsBezierItem::singleCurvePointAux(const QVector<QPointF>& points,
+QPointF GraphicsBezierItem::singleCurvePointAux(QVector<QPointF> buffer,
                                                 const qreal& parameter_t) {
-  QVector<QPointF> recalculated_points;
-  QVector<QPointF> temporary_buffer_points(points);
-  int point_list_size = points.size();
-  while (point_list_size > 1) {
-    recalculated_points.clear();
-    recalculated_points.reserve(point_list_size - 1);
-    for (int i = 0; i < point_list_size - 1; ++i)
-      recalculated_points.append(
-          (temporary_buffer_points[i + 1] - temporary_buffer_points[i]) *
-              parameter_t +
-          temporary_buffer_points[i]);
-    --point_list_size;
-    if (point_list_size == 1)
-      return recalculated_points.first();
-    temporary_buffer_points.clear();
-    temporary_buffer_points.reserve(point_list_size);
-    temporary_buffer_points = recalculated_points;
+  for (int point_list_size = buffer.size(); point_list_size > 1;
+       --point_list_size) {
+    for (int i = 0; i < point_list_size - 1; ++i) {
+      buffer[i] = (buffer[i + 1] - buffer[i]) * parameter_t + buffer[i];
+    }
   }
-  return points.first();
+  return buffer.first();
 }
 
 QPointF GraphicsBezierItem::singleCurvePoint(const qreal& parameter_t) {
