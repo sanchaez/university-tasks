@@ -167,7 +167,9 @@ void GraphicsBezierItem::paint(QPainter* painter,
   painter->drawPolyline(_curve_points.data(), _curve_points.size());
   painter->setPen(_lines_pen);
   painter->drawPolyline(getControlPoints());
+#ifdef QT_DEBUG
   painter->drawRect(_curve_boundaries);
+#endif
 }
 
 void GraphicsBezierItem::updateRect() {
@@ -218,7 +220,7 @@ void GraphicsBezierItem::updateCurveScale() {
       if (_scale > 1) {
         control_points_iterator.setValue(ControlPointItem(point / _scale));
       } else
-        control_points_iterator.setValue(ControlPointItem(point / _scale));
+        control_points_iterator.setValue(ControlPointItem(point * _scale));
     }
   }
 }
