@@ -101,9 +101,13 @@ class ControlPointItem : public QGraphicsItem {
 
   GraphicsBezierItem* getBezierCurve() const;
 
+  QColor getColor() const;
+  void setColor(const QColor& color);
+
  private:
   int _size = 5;
   QPen _pen;
+  QColor _color;
   GraphicsBezierItem* _bezier_curve;
 };
 

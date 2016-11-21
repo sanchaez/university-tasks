@@ -6,7 +6,7 @@ int gen_num_floored() {
 }
 
 #define INITIAL_NUM_OF_POINTS 20
-#define INITIAL_PRECISION_VALUE 0.005
+#define INITIAL_PRECISION_VALUE 0.001
 #define GEN_POINTF QPointF(gen_num_floored(), gen_num_floored())
 
 MainWindow::MainWindow(QWidget* parent)

@@ -5,7 +5,7 @@
 #include <cassert>
 #include <functional>
 
-#define DEFAULT_PRECISION 0.005
+#define DEFAULT_PRECISION 0.001
 
 #ifdef QT_DEBUG
 #include <QDebug>
@@ -38,19 +38,25 @@ GraphicsBezierItem::GraphicsBezierItem(const QPointF& c1,
   _lines_pen.setWidth(1);
   _control_points.reserve(2);
   _control_points.append(ControlPointItem(c1, this));
+  _control_points.last().setColor(Qt::magenta);
   _control_points.append(ControlPointItem(c2, this));
+  _control_points.last().setColor(Qt::magenta);
   update();
 }
 
 void GraphicsBezierItem::addControl(const QPointF& c) {
+  _control_points.last().setColor(Qt::gray);
   _control_points.append(ControlPointItem(c, this));
+  _control_points.last().setColor(Qt::magenta);
   update();
 }
 
 void GraphicsBezierItem::addControls(const QVector<QPointF>& c) {
+  _control_points.last().setColor(Qt::gray);
   foreach (QPointF point, c) {
     _control_points.append(ControlPointItem(point, this));
   }
+  _control_points.last().setColor(Qt::magenta);
   update();
 }
 
@@ -264,8 +270,4 @@ void GraphicsBezierItem::setScale(qreal scale) {
   _scale = scale;
   updateCurveScale();
   update();
-}
-
-GraphicsBezierItem* ControlPointItem::getBezierCurve() const {
-  return _bezier_curve;
 }

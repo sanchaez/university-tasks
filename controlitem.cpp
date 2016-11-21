@@ -29,6 +29,7 @@ ControlPointItem::ControlPointItem(const QPointF& pos,
     : QGraphicsItem(dynamic_cast<QGraphicsItem*>(parent)),
       _size(size),
       _pen(Qt::gray, 2, Qt::SolidLine, Qt::RoundCap),
+      _color(Qt::gray),
       _bezier_curve(parent) {
   setPos(pos);
   setAcceptHoverEvents(true);
@@ -66,12 +67,12 @@ void ControlPointItem::paint(QPainter* painter,
 
 void ControlPointItem::hoverEnterEvent(QGraphicsSceneHoverEvent* event) {
   Q_UNUSED(event)
-  _pen.setColor(Qt::red);
+  _pen.setColor(Qt::blue);
 }
 
 void ControlPointItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* event) {
   Q_UNUSED(event)
-  _pen.setColor(Qt::gray);
+  _pen.setColor(_color);
 }
 
 void ControlPointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
@@ -81,11 +82,13 @@ void ControlPointItem::mouseMoveEvent(QGraphicsSceneMouseEvent* event) {
 void ControlPointItem::mousePressEvent(QGraphicsSceneMouseEvent* event) {
   Q_UNUSED(event)
   setCursor(Qt::SizeAllCursor);
+  _pen.setColor(Qt::red);
 }
 
 void ControlPointItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* event) {
   Q_UNUSED(event)
   setCursor(Qt::PointingHandCursor);
+  _pen.setColor(_color);
 }
 
 QVariant ControlPointItem::itemChange(QGraphicsItem::GraphicsItemChange change,
@@ -111,4 +114,18 @@ QPen ControlPointItem::getPen() const {
 
 void ControlPointItem::setPen(const QPen& pen) {
   _pen = pen;
+  _color = pen.color();
+}
+
+GraphicsBezierItem* ControlPointItem::getBezierCurve() const {
+  return _bezier_curve;
+}
+
+QColor ControlPointItem::getColor() const {
+  return _color;
+}
+
+void ControlPointItem::setColor(const QColor& color) {
+  _color = color;
+  _pen.setColor(color);
 }
