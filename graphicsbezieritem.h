@@ -24,7 +24,10 @@ class GraphicsBezierItem : public QGraphicsItem {
   void addControl(const QPointF& c);
   void addControls(const QVector<QPointF>& c);
   void setControl(int num, const QPointF& c);
+  void setControls(QVector<QPointF>& c);
   void removeControl(int num);
+  void popControl();
+  void popControls(int num);
 
   void turn(int angle);
   void scale(int factor);
@@ -39,11 +42,17 @@ class GraphicsBezierItem : public QGraphicsItem {
 
   void update();
   QRectF boundingRect() const;
-
   void paint(QPainter* painter,
              const QStyleOptionGraphicsItem* option,
              QWidget* widget);
+
   QPointF singleCurvePoint(const qreal& parameter_t);
+
+  qreal getAngle() const;
+  void setAngle(qreal angle);
+
+  qreal getScale() const;
+  void setScale(qreal scale);
 
  private:
   QVector<ControlPointItem> _control_points;
@@ -51,12 +60,13 @@ class GraphicsBezierItem : public QGraphicsItem {
   QVector<QPointF> _curve_points;
   QRectF _curve_boundaries;
   QPen _curve_pen, _lines_pen;
+  qreal _angle, _angle_delta;
+  qreal _scale, _scale_delta;
   QPointF singleCurvePointAux(const QVector<QPointF>& points,
                               const qreal& parameter_t);
-  QVector<QPointF> controlPointsToQPointF(
-      const QVector<ControlPointItem>& source) const;
-
   void updateRect();
+  void updateCurveScale();
+  void updateCurveAngle();
 };
 
 class ControlPointItem : public QGraphicsItem {

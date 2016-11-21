@@ -54,7 +54,7 @@
       <property name="title">
        <string>Bezier controls</string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
@@ -99,6 +99,9 @@
            <property name="maximum">
             <double>0.999990000000000</double>
            </property>
+           <property name="singleStep">
+            <double>0.000010000000000</double>
+           </property>
            <property name="value">
             <double>0.005000000000000</double>
            </property>
@@ -107,103 +110,57 @@
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Angle:</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="angleLabel">
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider</cstring>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Angle:</string>
+           </property>
+           <property name="buddy">
+            <cstring>angleDoubleSpinBox</cstring>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QSlider" name="horizontalSlider">
+          <widget class="QDoubleSpinBox" name="angleDoubleSpinBox">
            <property name="minimum">
-            <number>-180</number>
+            <double>-180.000000000000000</double>
            </property>
            <property name="maximum">
-            <number>180</number>
+            <double>180.000000000000000</double>
            </property>
            <property name="singleStep">
-            <number>1</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBothSides</enum>
-           </property>
-           <property name="tickInterval">
-            <number>30</number>
+            <double>0.050000000000000</double>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Scale:</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider</cstring>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="scaleLabel">
-             <property name="text">
-              <string>0</string>
-             </property>
-             <property name="buddy">
-              <cstring>horizontalSlider</cstring>
-             </property>
-            </widget>
-           </item>
-          </layout>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Scale:</string>
+           </property>
+           <property name="buddy">
+            <cstring>scaleDoubleSpinBox</cstring>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QSlider" name="horizontalSlider_2">
-           <property name="minimum">
-            <number>-10</number>
+          <widget class="QDoubleSpinBox" name="scaleDoubleSpinBox">
+           <property name="decimals">
+            <number>3</number>
            </property>
            <property name="maximum">
-            <number>10</number>
+            <double>5.000000000000000</double>
            </property>
            <property name="singleStep">
-            <number>1</number>
+            <double>0.005000000000000</double>
            </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="invertedAppearance">
-            <bool>false</bool>
-           </property>
-           <property name="tickPosition">
-            <enum>QSlider::TicksBothSides</enum>
-           </property>
-           <property name="tickInterval">
-            <number>1</number>
+           <property name="value">
+            <double>1.000000000000000</double>
            </property>
           </widget>
          </item>
@@ -229,23 +186,13 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <tabstops>
+  <tabstop>pointNumberSpinBox</tabstop>
+  <tabstop>precisionSpinBox</tabstop>
+  <tabstop>angleDoubleSpinBox</tabstop>
+  <tabstop>scaleDoubleSpinBox</tabstop>
+  <tabstop>graphicsView</tabstop>
+ </tabstops>
  <resources/>
- <connections>
-  <connection>
-   <sender>horizontalSlider</sender>
-   <signal>sliderMoved(int)</signal>
-   <receiver>angleLabel</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>499</x>
-     <y>375</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>497</x>
-     <y>351</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
