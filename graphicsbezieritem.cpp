@@ -41,6 +41,8 @@ GraphicsBezierItem::GraphicsBezierItem(const QPointF& c1,
   _control_points.last().setColor(Qt::magenta);
   _control_points.append(ControlPointItem(c2, this));
   _control_points.last().setColor(Qt::magenta);
+  updateRect();
+  _rotation_center = _curve_boundaries.center();
   update();
 }
 
@@ -72,6 +74,7 @@ void GraphicsBezierItem::removeControl(int num) {
 
 void GraphicsBezierItem::popControl() {
   _control_points.pop_back();
+  _control_points.last().setColor(Qt::magenta);
   update();
 }
 
@@ -79,6 +82,7 @@ void GraphicsBezierItem::popControls(int num) {
   for (int i = 0; i < num; ++i) {
     _control_points.pop_back();
   }
+  _control_points.last().setColor(Qt::magenta);
   update();
 }
 
@@ -195,32 +199,38 @@ void GraphicsBezierItem::updateCurveAngle() {
   QMutableVectorIterator<ControlPointItem> control_points_iterator(
       _control_points);
   qreal angle_radians = (M_PI * _angle_delta) / 180;
-  QPointF rect_center = _curve_boundaries.center();
+  if (_angle == 0)
+    _rotation_center = _curve_boundaries.center();
+
   while (control_points_iterator.hasNext()) {
     QPointF point = control_points_iterator.next().pos();
-    control_points_iterator.setValue(ControlPointItem(QPointF(
-        (rect_center.x() + (point.x() - rect_center.x()) * qCos(angle_radians) -
-         (point.y() - rect_center.y()) * qSin(angle_radians)),
-        (rect_center.y() + (point.y() - rect_center.y()) * qCos(angle_radians) +
-         (point.x() - rect_center.x()) * qSin(angle_radians)))));
+    control_points_iterator.setValue(ControlPointItem(
+        QPointF((_rotation_center.x() +
+                 (point.x() - _rotation_center.x()) * qCos(angle_radians) -
+                 (point.y() - _rotation_center.y()) * qSin(angle_radians)),
+                (_rotation_center.y() +
+                 (point.y() - _rotation_center.y()) * qCos(angle_radians) +
+                 (point.x() - _rotation_center.x()) * qSin(angle_radians)))));
   }
 }
 
 void GraphicsBezierItem::updateCurveScale() {
-  QMutableVectorIterator<ControlPointItem> control_points_iterator(
-      _control_points);
-  while (control_points_iterator.hasNext()) {
-    QPointF point = control_points_iterator.next().pos();
-    if ((_scale_delta < 0)) {
-      if (_scale > 1) {
-        control_points_iterator.setValue(ControlPointItem(point * _scale));
-      } else
-        control_points_iterator.setValue(ControlPointItem(point / _scale));
-    } else if (_scale_delta > 0) {
-      if (_scale > 1) {
-        control_points_iterator.setValue(ControlPointItem(point / _scale));
-      } else
-        control_points_iterator.setValue(ControlPointItem(point * _scale));
+  if (_scale != 0) {
+    QMutableVectorIterator<ControlPointItem> control_points_iterator(
+        _control_points);
+    while (control_points_iterator.hasNext()) {
+      QPointF point = control_points_iterator.next().pos();
+      if ((_scale_delta < 0)) {
+        if (_scale > 1) {
+          control_points_iterator.setValue(ControlPointItem(point * _scale));
+        } else
+          control_points_iterator.setValue(ControlPointItem(point / _scale));
+      } else if (_scale_delta > 0) {
+        if (_scale > 1) {
+          control_points_iterator.setValue(ControlPointItem(point / _scale));
+        } else
+          control_points_iterator.setValue(ControlPointItem(point * _scale));
+      }
     }
   }
 }

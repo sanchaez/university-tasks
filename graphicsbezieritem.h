@@ -58,10 +58,12 @@ class GraphicsBezierItem : public QGraphicsItem {
   QVector<ControlPointItem> _control_points;
   qreal _precision;
   QVector<QPointF> _curve_points;
+  QPointF _rotation_center;
   QRectF _curve_boundaries;
   QPen _curve_pen, _lines_pen;
   qreal _angle, _angle_delta;
   qreal _scale, _scale_delta;
+
   void updateRect();
   void updateCurveScale();
   void updateCurveAngle();
