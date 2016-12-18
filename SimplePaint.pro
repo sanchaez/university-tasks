@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,9 +14,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    editrect.cpp
+    scribblearea.cpp \
+    scribblescrollarea.cpp
 
 HEADERS  += mainwindow.h \
-    editrect.h
+    scribblearea.h \
+    scribblescrollarea.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    icons.qrc

@@ -6,33 +6,22 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>559</width>
-    <height>424</height>
+    <width>784</width>
+    <height>630</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QGraphicsView" name="graphicsView">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout"/>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>559</width>
+     <width>784</width>
      <height>19</height>
     </rect>
    </property>
@@ -74,8 +63,16 @@
     <enum>LeftToolBarArea</enum>
    </attribute>
    <attribute name="toolBarBreak">
-    <bool>true</bool>
+    <bool>false</bool>
    </attribute>
+   <addaction name="actionPen"/>
+   <addaction name="actionRect"/>
+   <addaction name="actionFill"/>
+   <addaction name="actionPolyline"/>
+   <addaction name="separator"/>
+   <addaction name="actionForegroundColor"/>
+   <addaction name="actionBackgroundColor"/>
+   <addaction name="actionStrokeSize"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
@@ -123,8 +120,95 @@
     <string>About...</string>
    </property>
   </action>
+  <action name="actionPen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/pencil.png</normaloff>
+     <normalon>:/png/png/pencil.png</normalon>:/png/pencil.png</iconset>
+   </property>
+   <property name="text">
+    <string>Pen</string>
+   </property>
+  </action>
+  <action name="actionRect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/marquee-2.png</normaloff>
+     <normalon>:/png/png/vector-1.png</normalon>:/png/marquee-2.png</iconset>
+   </property>
+   <property name="text">
+    <string>Rect</string>
+   </property>
+  </action>
+  <action name="actionPolyline">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/polygon.png</normaloff>:/png/polygon.png</iconset>
+   </property>
+   <property name="text">
+    <string>Polyline</string>
+   </property>
+  </action>
+  <action name="actionFill">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/paint-bucket.png</normaloff>
+     <normalon>:/png/png/paint-bucket.png</normalon>:/png/paint-bucket.png</iconset>
+   </property>
+   <property name="text">
+    <string>Bucket Fill</string>
+   </property>
+  </action>
+  <action name="actionForegroundColor">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/foreground.png</normaloff>:/png/foreground.png</iconset>
+   </property>
+   <property name="text">
+    <string>Foreground Color</string>
+   </property>
+   <property name="toolTip">
+    <string>Foreground Color</string>
+   </property>
+  </action>
+  <action name="actionBackgroundColor">
+   <property name="icon">
+    <iconset>
+     <normalon>:/png/background.png</normalon>
+    </iconset>
+   </property>
+   <property name="text">
+    <string>Background Color</string>
+   </property>
+   <property name="toolTip">
+    <string>Background Color</string>
+   </property>
+  </action>
+  <action name="actionStrokeSize">
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/scale.png</normaloff>:/png/scale.png</iconset>
+   </property>
+   <property name="text">
+    <string>StrokeSize</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>
