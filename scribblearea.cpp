@@ -8,6 +8,7 @@
 
 #include <QCursor>
 #include <QQueue>
+#include <QStack>
 #include <QThread>
 
 ScribbleArea::ScribbleArea(QWidget* parent)
@@ -21,7 +22,8 @@ ScribbleArea::ScribbleArea(QWidget* parent)
   scribbling = false;
   useBackgroundColor = false;
   penWidth = 1;
-  foregroundToolColor = Qt::blue;
+  foregroundToolColor = Qt::black;
+  backgroundToolColor = Qt::white;
   tool = ScribbleArea::ToolType::Pen;
 }
 
@@ -67,7 +69,7 @@ void ScribbleArea::mousePressEvent(QMouseEvent* event) {
       scribbling = true;
       break;
     case ScribbleArea::ToolType::Bucket:
-      floodFill(event->pos());
+      floodFillQueueOptimized(event->pos());
       break;
     default:
       event->ignore();
@@ -103,26 +105,7 @@ void ScribbleArea::mouseReleaseEvent(QMouseEvent* event) {
   }
 }
 
-// Flood-fill (node, target-color, replacement-color):
-// 1. If target-color is equal to replacement-color, return.
-// 2. If color of node is not equal to target-color, return.
-// 3. Set Q to the empty queue.
-// 4. Add node to Q.
-// 5. For each element N of Q:
-// 6.         Set w and e equal to N.
-// 7.         Move w to the west until the color of the node to the west of w no
-// longer matches target-color.
-// 8.         Move e to the east until the color of the node to the east of e no
-// longer matches target-color.
-// 9.         For each node n between w and e:
-// 10.             Set the color of n to replacement-color.
-// 11.             If the color of the node to the north of n is target-color,
-// add that node to Q.
-// 12.             If the color of the node to the south of n is target-color,
-// add that node to Q.
-// 13. Continue looping until Q is exhausted.
-// 14. Return.
-void ScribbleArea::floodFill(const QPoint& from) {
+void ScribbleArea::floodFillQueueOptimized(const QPoint& from) {
   QQueue<QPoint> pixelQueue;
   QColor targetColor = image.pixelColor(from), fillColor;
   if (useBackgroundColor) {
@@ -151,7 +134,7 @@ void ScribbleArea::floodFill(const QPoint& from) {
       image.setPixelColor(xcoord, ycoord, fillColor);
       // QThread::msleep(1);
 
-      QCoreApplication::processEvents();
+      // QCoreApplication::processEvents();
       if (ycoord > 0 && ycoord < image.height() - 1) {
         if (image.pixelColor(xcoord, ycoord - 1) == targetColor) {
           pixelQueue.enqueue(QPoint(xcoord, ycoord - 1));
@@ -164,11 +147,102 @@ void ScribbleArea::floodFill(const QPoint& from) {
   }
   update();
 }
+
+void ScribbleArea::scanlineFillQueue(const QPoint& from) {
+  QColor targetColor = image.pixelColor(from), fillColor;
+  if (useBackgroundColor) {
+    fillColor = backgroundToolColor;
+  } else {
+    fillColor = foregroundToolColor;
+  }
+  if (targetColor == fillColor) return;
+  QStack<QPoint> pixels;
+  pixels.push(from);
+
+  while (!pixels.empty()) {
+    QPoint nextPoint = pixels.pop();
+    while (nextPoint.y() >= 0 && image.pixelColor(nextPoint) == targetColor)
+      nextPoint.setY(nextPoint.y() - 1);
+    nextPoint.setY(nextPoint.y() + 1);
+    bool left = false;
+    bool right = false;
+    while (nextPoint.y() < image.height() &&
+           image.pixelColor(nextPoint) == targetColor) {
+      image.setPixelColor(nextPoint, fillColor);
+      if (!left && nextPoint.x() > 0 &&
+          image.pixelColor(nextPoint.x() - 1, nextPoint.y()) == targetColor) {
+        pixels.push(QPoint(nextPoint.x() - 1, nextPoint.y()));
+        left = true;
+      } else if (left && nextPoint.x() - 1 == 0 &&
+                 image.pixelColor(nextPoint.x() - 1, nextPoint.y()) !=
+                     targetColor)
+        left = false;
+
+      if (!right && nextPoint.x() < image.width() - 1 &&
+          image.pixelColor(nextPoint.x() + 1, nextPoint.y()) == targetColor) {
+        pixels.push(QPoint(nextPoint.x() + 1, nextPoint.y()));
+        right = true;
+      } else if (right && nextPoint.x() < image.width() - 1 &&
+                 image.pixelColor(nextPoint.x() + 1, nextPoint.y()) !=
+                     targetColor) {
+        right = false;
+      }
+      nextPoint.setY(nextPoint.y() + 1);
+    }
+  }
+  update();
+}
+
+void ScribbleArea::scanlineFillStack(const QPoint& from) {
+  QColor targetColor = image.pixelColor(from), fillColor;
+  if (useBackgroundColor) {
+    fillColor = backgroundToolColor;
+  } else {
+    fillColor = foregroundToolColor;
+  }
+  if (targetColor == fillColor) return;
+  QStack<QPoint> pixels;
+  pixels.push(from);
+
+  while (!pixels.empty()) {
+    QPoint nextPoint = pixels.pop();
+    while (nextPoint.y() >= 0 && image.pixelColor(nextPoint) == targetColor)
+      nextPoint.setY(nextPoint.y() - 1);
+    nextPoint.setY(nextPoint.y() + 1);
+    bool left = false;
+    bool right = false;
+    while (nextPoint.y() < image.height() &&
+           image.pixelColor(nextPoint) == targetColor) {
+      image.setPixelColor(nextPoint, fillColor);
+      if (!left && nextPoint.x() > 0 &&
+          image.pixelColor(nextPoint.x() - 1, nextPoint.y()) == targetColor) {
+        pixels.push(QPoint(nextPoint.x() - 1, nextPoint.y()));
+        left = true;
+      } else if (left && nextPoint.x() - 1 == 0 &&
+                 image.pixelColor(nextPoint.x() - 1, nextPoint.y()) !=
+                     targetColor)
+        left = false;
+
+      if (!right && nextPoint.x() < image.width() - 1 &&
+          image.pixelColor(nextPoint.x() + 1, nextPoint.y()) == targetColor) {
+        pixels.push(QPoint(nextPoint.x() + 1, nextPoint.y()));
+        right = true;
+      } else if (right && nextPoint.x() < image.width() - 1 &&
+                 image.pixelColor(nextPoint.x() + 1, nextPoint.y()) !=
+                     targetColor) {
+        right = false;
+      }
+      nextPoint.setY(nextPoint.y() + 1);
+    }
+  }
+  update();
+}
+
 void ScribbleArea::paintEvent(QPaintEvent* event) {
   QPainter painter(this);
   painter.scale(scale, scale);
   QRect dirtyRect = event->rect();
-  // painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
+  painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
   painter.drawImage(dirtyRect, image, dirtyRect);
 }
 
@@ -176,7 +250,9 @@ void ScribbleArea::resizeEvent(QResizeEvent* event) {
   QWidget::resizeEvent(event);
 }
 
-QSize ScribbleArea::minimumSizeHint() const { return size(); }
+QSize ScribbleArea::minimumSizeHint() const {
+  return image.rect().size() * scale;
+}
 
 QSize ScribbleArea::sizeHint() const { return image.rect().size() * scale; }
 

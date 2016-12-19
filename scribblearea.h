@@ -46,7 +46,9 @@ class ScribbleArea : public QWidget {
 
  private:
   void drawLineTo(const QPoint& endPoint);
-  void floodFill(const QPoint& from);
+  void floodFillQueueOptimized(const QPoint& from);
+  void scanlineFillQueue(const QPoint& from);
+  void scanlineFillStack(const QPoint& from);
   void resizeImage(QImage* image, const QSize& newSize);
 
   ToolType tool;

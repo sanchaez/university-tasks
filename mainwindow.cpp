@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
   actionPolyline->setData(static_cast<int>(ScribbleArea::ToolType::Polygon));
   actionPen->setChecked(true);
   QObject::connect(actionExit, &QAction::triggered, this, &MainWindow::close);
+  QObject::connect(actionClearAll, &QAction::triggered, drawingArea,
+                   &ScribbleArea::clearImage);
 }
 
 void MainWindow::setNewTool(QAction* a) {
