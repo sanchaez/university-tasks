@@ -1,8 +1,8 @@
 #ifndef SCRIBBLEAREA_H
 #define SCRIBBLEAREA_H
 
-#include <QWidget>
 #include <QSize>
+#include <QWidget>
 
 class ScribbleArea : public QWidget {
   Q_OBJECT
@@ -25,6 +25,9 @@ class ScribbleArea : public QWidget {
   qreal getScale() const;
   void setScale(const qreal& value);
 
+  QColor getBackgroundToolColor() const;
+  void setBackgroundToolColor(const QColor& value);
+
  public slots:
   void setTool(const ToolType& value);
   void clearImage();
@@ -43,13 +46,13 @@ class ScribbleArea : public QWidget {
 
  private:
   void drawLineTo(const QPoint& endPoint);
-
+  void floodFill(const QPoint& from);
   void resizeImage(QImage* image, const QSize& newSize);
 
   ToolType tool;
 
-  bool modified;
-  bool scribbling;
+  bool modified, scribbling, useBackgroundColor;
+
   int penWidth;
   qreal scale;
   QColor foregroundToolColor, backgroundToolColor;

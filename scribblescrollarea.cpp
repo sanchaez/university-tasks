@@ -17,10 +17,10 @@ void ScribbleScrollArea::wheelEvent(QWheelEvent* event) {
     }
     scribbleArea->setScale(newScale);
 
-    QPointF scrollbarPos =
-        QPointF(horizontalScrollBar()->value(), verticalScrollBar()->value());
-    QPointF delta = (event->posF() / oldScale - widget()->pos() / oldScale) *
-                    (newScale - oldScale);
+    QPoint scrollbarPos =
+        QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
+    QPoint delta = (event->pos() / oldScale - widget()->pos() / oldScale) *
+                   (newScale - oldScale);
     horizontalScrollBar()->setValue(scrollbarPos.x() + delta.x());
     verticalScrollBar()->setValue(scrollbarPos.y() + delta.y());
   } else {
