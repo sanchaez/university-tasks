@@ -17,14 +17,12 @@ void ScribbleScrollArea::wheelEvent(QWheelEvent* event) {
     }
     scribbleArea->setScale(newScale);
 
-    //    QPoint scrollbarPos =
-    //        QPoint(horizontalScrollBar()->value(),
-    //        verticalScrollBar()->value());
-    //    QPoint delta = (event->pos() / oldScale - widget()->pos() / oldScale)
-    //    *
-    //                   (newScale - oldScale);
-    //    horizontalScrollBar()->setValue(scrollbarPos.x() + delta.x());
-    //    verticalScrollBar()->setValue(scrollbarPos.y() + delta.y());
+    QPoint scrollbarPos =
+        QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
+    QPoint delta = (event->pos() / oldScale - widget()->pos() / oldScale) *
+                   (newScale - oldScale);
+    horizontalScrollBar()->setValue(scrollbarPos.x() + delta.x());
+    verticalScrollBar()->setValue(scrollbarPos.y() + delta.y());
   } else {
     QScrollArea::wheelEvent(event);
   }
@@ -32,7 +30,7 @@ void ScribbleScrollArea::wheelEvent(QWheelEvent* event) {
 
 void ScribbleScrollArea::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
-    case Qt::Key_Shift:
+    case Qt::Key_Control:
       scalingMode = true;
       break;
     default:
@@ -43,7 +41,7 @@ void ScribbleScrollArea::keyPressEvent(QKeyEvent* event) {
 
 void ScribbleScrollArea::keyReleaseEvent(QKeyEvent* event) {
   switch (event->key()) {
-    case Qt::Key_Shift:
+    case Qt::Key_Control:
       scalingMode = false;
       break;
     default:

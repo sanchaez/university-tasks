@@ -22,10 +22,21 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   void on_actionStrokeSize_triggered();
 
+  void on_actionAbout_triggered();
+
+  void on_actionSave_triggered();
+
+  void on_actionSave_as_triggered();
+
+  void on_actionOpen_triggered();
+
+  void on_actionNew_triggered();
+
  private:
   ScribbleArea* drawingArea;
   ScribbleScrollArea* scrollArea;
   QActionGroup* toolsGroup;
+  QString lastSavePath, lastFileFormat;
 };
 
 #endif  // MAINWINDOW_H
