@@ -40,9 +40,9 @@
     <property name="title">
      <string>Edit</string>
     </property>
+    <addaction name="actionUndo"/>
+    <addaction name="actionRedo"/>
     <addaction name="actionClearAll"/>
-    <addaction name="separator"/>
-    <addaction name="actionSelect"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -69,12 +69,13 @@
    </attribute>
    <addaction name="actionPen"/>
    <addaction name="actionRect"/>
+   <addaction name="actionEllipse"/>
    <addaction name="actionFill"/>
-   <addaction name="actionPolyline"/>
    <addaction name="separator"/>
    <addaction name="actionForegroundColor"/>
    <addaction name="actionBackgroundColor"/>
    <addaction name="actionStrokeSize"/>
+   <addaction name="actionFilled"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionOpen">
@@ -109,7 +110,7 @@
   </action>
   <action name="actionSelect">
    <property name="text">
-    <string>Perferences...</string>
+    <string>Preferences...</string>
    </property>
   </action>
   <action name="actionNew">
@@ -210,6 +211,31 @@
   <action name="actionClearAll">
    <property name="text">
     <string>Clear all</string>
+   </property>
+  </action>
+  <action name="actionFilled">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/square-23.png</normaloff>
+     <normalon>:/png/square-20.png</normalon>:/png/square-23.png</iconset>
+   </property>
+   <property name="text">
+    <string>Filled</string>
+   </property>
+  </action>
+  <action name="actionEllipse">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="icons.qrc">
+     <normaloff>:/png/circle.png</normaloff>:/png/circle.png</iconset>
+   </property>
+   <property name="text">
+    <string>Ellipse</string>
    </property>
   </action>
  </widget>

@@ -12,38 +12,36 @@
 #include <QThread>
 
 ScribbleArea::ScribbleArea(QWidget* parent)
-    : QWidget(parent),
-      scale(1),
-      image(500, 500, QImage::Format_ARGB32_Premultiplied) {
-  setAttribute(Qt::WA_StaticContents);
+    : QWidget(parent), image(500, 500, QImage::Format_ARGB32_Premultiplied) {
+  // setAttribute(Qt::WA_StaticContents);
   // setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
   clearImage();
   modified = false;
   scribbling = false;
   useBackgroundColor = false;
+  equalMode = false;
   penWidth = 1;
+  scale = 1;
   foregroundToolColor = Qt::black;
   backgroundToolColor = Qt::white;
   tool = ScribbleArea::ToolType::Pen;
+  // undoStack.push(image);
 }
 
 bool ScribbleArea::openImage(const QString& fileName) {
   QImage loadedImage;
   if (!loadedImage.load(fileName)) return false;
-
-  QSize newSize = loadedImage.size().expandedTo(size());
-  resizeImage(&loadedImage, newSize);
-  image = loadedImage;
-  modified = false;
   update();
+  scale = 1;
+  resize(loadedImage.size());
+  undoStack.clear();
+  redoStack.clear();
+
   return true;
 }
 
 bool ScribbleArea::saveImage(const QString& fileName, const char* fileFormat) {
-  QImage visibleImage = image;
-  resizeImage(&visibleImage, size());
-
-  if (visibleImage.save(fileName, fileFormat)) {
+  if (image.save(fileName, fileFormat)) {
     modified = false;
     return true;
   } else {
@@ -63,13 +61,17 @@ void ScribbleArea::mousePressEvent(QMouseEvent* event) {
   } else if (event->button() != Qt::LeftButton) {
     event->ignore();
   }
+  undoStack.push(image);
+  if (!redoStack.isEmpty()) redoStack.clear();
   switch (tool) {
     case ScribbleArea::ToolType::Pen:
+    case ScribbleArea::ToolType::Rectangle:
+    case ScribbleArea::ToolType::Ellipse:
       lastPoint = event->pos() / scale;
       scribbling = true;
       break;
     case ScribbleArea::ToolType::Bucket:
-      floodFillQueueOptimized(event->pos());
+      floodFillQueueOptimized(event->pos() / scale);
       break;
     default:
       event->ignore();
@@ -77,10 +79,18 @@ void ScribbleArea::mousePressEvent(QMouseEvent* event) {
 }
 
 void ScribbleArea::mouseMoveEvent(QMouseEvent* event) {
-  if ((event->buttons() & (Qt::LeftButton || Qt::RightButton)) && scribbling)
+  if ((event->buttons() & (Qt::LeftButton | Qt::RightButton)) && scribbling)
     switch (tool) {
       case ScribbleArea::ToolType::Pen:
         drawLineTo(event->pos() / scale);
+        break;
+      case ScribbleArea::ToolType::Rectangle:
+        image = undoStack.top();
+        drawRectTo(event->pos() / scale);
+        break;
+      case ScribbleArea::ToolType::Ellipse:
+        image = undoStack.top();
+        drawEllipseTo(event->pos() / scale);
         break;
       default:
         event->ignore();
@@ -89,19 +99,54 @@ void ScribbleArea::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void ScribbleArea::mouseReleaseEvent(QMouseEvent* event) {
-  if (event->button() == Qt::LeftButton && scribbling) {
+  if ((event->buttons() & (Qt::LeftButton | Qt::RightButton)) && scribbling) {
     switch (tool) {
       case ScribbleArea::ToolType::Pen:
         drawLineTo(event->pos() / scale);
         scribbling = false;
         break;
+      case ScribbleArea::ToolType::Rectangle:
+        image = undoStack.top();
+        drawRectTo(event->pos() / scale);
+        scribbling = false;
+        break;
+      case ScribbleArea::ToolType::Ellipse:
+        image = undoStack.top();
+        drawEllipseTo(event->pos() / scale);
+        scribbling = false;
+        break;
       default:
         event->ignore();
     }
-  } else if (event->button() == Qt::RightButton) {
-    useBackgroundColor = false;
+    if (event->button() == Qt::RightButton) {
+      useBackgroundColor = false;
+    }
+
   } else {
     event->ignore();
+  }
+  update();
+}
+
+void ScribbleArea::keyPressEvent(QKeyEvent* event) {
+  switch (event->key()) {
+    case Qt::Key_Shift:
+      equalMode = true;
+      break;
+    default:
+      event->ignore();
+      break;
+  }
+}
+
+void ScribbleArea::keyReleaseEvent(QKeyEvent* event) {
+  switch (event->key()) {
+    case Qt::Key_Shift:
+      equalMode = false;
+      break;
+    default:
+      event->ignore();
+      break;
   }
 }
 
@@ -241,8 +286,8 @@ void ScribbleArea::scanlineFillStack(const QPoint& from) {
 void ScribbleArea::paintEvent(QPaintEvent* event) {
   QPainter painter(this);
   painter.scale(scale, scale);
-  QRect dirtyRect = event->rect();
-  painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
+  QRect dirtyRect =
+      painter.matrix().inverted().mapRect(event->rect()).adjusted(-1, -1, 1, 1);
   painter.drawImage(dirtyRect, image, dirtyRect);
 }
 
@@ -274,6 +319,62 @@ void ScribbleArea::drawLineTo(const QPoint& endPoint) {
   lastPoint = endPoint;
 }
 
+void ScribbleArea::drawRectTo(const QPoint& endPoint) {
+  QPainter painter(&image);
+  if (useBackgroundColor) {
+    painter.setPen(QPen(backgroundToolColor, penWidth, Qt::SolidLine,
+                        Qt::RoundCap, Qt::RoundJoin));
+    if (filled && lastPoint != endPoint) {
+      painter.setBrush(QBrush(foregroundToolColor));
+    }
+
+  } else {
+    painter.setPen(QPen(foregroundToolColor, penWidth, Qt::SolidLine,
+                        Qt::RoundCap, Qt::RoundJoin));
+    if (filled && lastPoint != endPoint) {
+      painter.setBrush(QBrush(backgroundToolColor));
+    }
+  }
+  QPainterPath path;
+  if (equalMode) {
+    path.addRect(QRect(
+        lastPoint, QPoint(lastPoint.x() + qAbs(lastPoint.x() - endPoint.x()),
+                          lastPoint.y() + qAbs(lastPoint.x() - endPoint.x()))));
+  } else {
+    path.addRect(QRect(lastPoint, endPoint));
+  }
+  painter.fillPath(path, painter.brush());
+  painter.drawPath(path);
+}
+
+void ScribbleArea::drawEllipseTo(const QPoint& endPoint) {
+  QPainter painter(&image);
+  if (useBackgroundColor) {
+    painter.setPen(QPen(backgroundToolColor, penWidth, Qt::SolidLine,
+                        Qt::RoundCap, Qt::RoundJoin));
+    if (filled && lastPoint != endPoint) {
+      painter.setBrush(QBrush(foregroundToolColor));
+    }
+
+  } else {
+    painter.setPen(QPen(foregroundToolColor, penWidth, Qt::SolidLine,
+                        Qt::RoundCap, Qt::RoundJoin));
+    if (filled && lastPoint != endPoint) {
+      painter.setBrush(QBrush(backgroundToolColor));
+    }
+  }
+  QPainterPath path;
+  if (equalMode) {
+    path.addEllipse(QRect(
+        lastPoint, QPoint(lastPoint.x() + qAbs(lastPoint.x() - endPoint.x()),
+                          lastPoint.y() + qAbs(lastPoint.x() - endPoint.x()))));
+  } else {
+    path.addEllipse(QRect(lastPoint, endPoint));
+  }
+  painter.fillPath(path, painter.brush());
+  painter.drawPath(path);
+}
+
 void ScribbleArea::resizeImage(QImage* image, const QSize& newSize) {
   if (image->size() == newSize) return;
 
@@ -282,6 +383,28 @@ void ScribbleArea::resizeImage(QImage* image, const QSize& newSize) {
   QPainter painter(&newImage);
   painter.drawImage(QPoint(0, 0), *image);
   *image = newImage;
+}
+
+bool ScribbleArea::isModified() const { return modified; }
+
+bool ScribbleArea::getFilled() const { return filled; }
+
+void ScribbleArea::setFilled(bool value) { filled = value; }
+
+void ScribbleArea::undo() {
+  if (!undoStack.isEmpty()) {
+    redoStack.push(image);
+    image = undoStack.pop();
+  }
+  update();
+}
+
+void ScribbleArea::redo() {
+  if (!redoStack.isEmpty()) {
+    image = redoStack.pop();
+    undoStack.push(image);
+  }
+  update();
 }
 
 QColor ScribbleArea::getBackgroundToolColor() const {
@@ -299,9 +422,6 @@ void ScribbleArea::setScale(const qreal& value) {
   resize(image.size() * scale);
   update();
 }
-
-bool ScribbleArea::isModified() const { return modified; }
-
 int ScribbleArea::getPenWidth() const { return penWidth; }
 
 void ScribbleArea::setPenWidth(int value) { penWidth = value; }
@@ -318,6 +438,22 @@ ScribbleArea::ToolType ScribbleArea::getTool() const { return tool; }
 
 void ScribbleArea::setTool(const ScribbleArea::ToolType& value) {
   tool = value;
+}
+
+void ScribbleArea::newImage() {
+  image = QImage(500, 500, QImage::Format_ARGB32_Premultiplied);
+
+  undoStack.clear();
+  redoStack.clear();
+  clearImage();
+  scribbling = false;
+  useBackgroundColor = false;
+  equalMode = false;
+  penWidth = 1;
+  scale = 1;
+  foregroundToolColor = Qt::black;
+  backgroundToolColor = Qt::white;
+  tool = ScribbleArea::ToolType::Pen;
 }
 
 void ScribbleArea::print() {
