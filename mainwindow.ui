@@ -149,24 +149,21 @@
            <property name="text">
             <string>Scale:</string>
            </property>
-           <property name="buddy">
-            <cstring>scaleDoubleSpinBox</cstring>
-           </property>
           </widget>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="scaleDoubleSpinBox">
-           <property name="decimals">
-            <number>3</number>
+          <widget class="QSlider" name="horizontalSlider">
+           <property name="minimum">
+            <number>1</number>
            </property>
            <property name="maximum">
-            <double>5.000000000000000</double>
-           </property>
-           <property name="singleStep">
-            <double>0.005000000000000</double>
+            <number>200</number>
            </property>
            <property name="value">
-            <double>1.000000000000000</double>
+            <number>100</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
           </widget>
          </item>
@@ -196,7 +193,6 @@
   <tabstop>pointNumberSpinBox</tabstop>
   <tabstop>precisionSpinBox</tabstop>
   <tabstop>angleDoubleSpinBox</tabstop>
-  <tabstop>scaleDoubleSpinBox</tabstop>
   <tabstop>graphicsView</tabstop>
  </tabstops>
  <resources/>

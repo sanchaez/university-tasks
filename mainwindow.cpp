@@ -46,10 +46,10 @@ void MainWindow::on_precisionSpinBox_valueChanged(double arg1) {
   gbi.setPrecision(arg1);
 }
 
-void MainWindow::on_scaleDoubleSpinBox_valueChanged(double arg1) {
-  gbi.setScale(arg1);
-}
-
 void MainWindow::on_angleDoubleSpinBox_valueChanged(double arg1) {
   gbi.setAngle(arg1);
+}
+
+void MainWindow::on_horizontalSlider_valueChanged(int value) {
+  gbi.setScale(value / 100.);
 }

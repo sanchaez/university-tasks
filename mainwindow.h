@@ -15,9 +15,9 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 
   void on_precisionSpinBox_valueChanged(double arg1);
 
-  void on_scaleDoubleSpinBox_valueChanged(double arg1);
-
   void on_angleDoubleSpinBox_valueChanged(double arg1);
+
+  void on_horizontalSlider_valueChanged(int value);
 
  private:
   QGraphicsScene* scene;
