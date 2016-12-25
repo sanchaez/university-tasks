@@ -32,6 +32,9 @@ class ScribbleArea : public QWidget {
 
   bool isModified() const;
 
+  bool getDrawingState() const;
+  void setDrawingState(bool value);
+
  public slots:
   void undo();
   void redo();
@@ -46,6 +49,7 @@ class ScribbleArea : public QWidget {
   void mouseReleaseEvent(QMouseEvent* event) Q_DECL_OVERRIDE;
   void keyPressEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
   void keyReleaseEvent(QKeyEvent* event) Q_DECL_OVERRIDE;
+
   void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
   void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
 
@@ -63,7 +67,8 @@ class ScribbleArea : public QWidget {
 
   ToolType tool;
 
-  bool modified, scribbling, filled, useBackgroundColor, equalMode;
+  bool modified, scribbling, filled, useBackgroundColor, equalMode,
+      allowDrawing;
 
   int penWidth;
   qreal scale;

@@ -1,4 +1,5 @@
 #include "scribblescrollarea.h"
+
 #include <QScrollBar>
 #include <QWheelEvent>
 ScribbleScrollArea::ScribbleScrollArea(ScribbleArea* a)
@@ -26,12 +27,17 @@ void ScribbleScrollArea::wheelEvent(QWheelEvent* event) {
   } else {
     QScrollArea::wheelEvent(event);
   }
+  setMouseTracking(true);
 }
 
 void ScribbleScrollArea::keyPressEvent(QKeyEvent* event) {
   switch (event->key()) {
     case Qt::Key_Control:
       scalingMode = true;
+      scribbleArea->setDrawingState(false);
+      setCursor(Qt::OpenHandCursor);
+      areaCursor = scribbleArea->cursor();
+      scribbleArea->setCursor(Qt::OpenHandCursor);
       break;
     default:
       event->ignore();
@@ -43,10 +49,39 @@ void ScribbleScrollArea::keyReleaseEvent(QKeyEvent* event) {
   switch (event->key()) {
     case Qt::Key_Control:
       scalingMode = false;
+      scribbleArea->setDrawingState(true);
+      setCursor(Qt::ArrowCursor);
+      scribbleArea->setCursor(areaCursor);
       break;
     default:
       event->ignore();
       break;
+  }
+}
+
+void ScribbleScrollArea::mouseMoveEvent(QMouseEvent* event) {
+  if (scalingMode) {
+    QPoint scrollbarPos =
+        QPoint(horizontalScrollBar()->value(), verticalScrollBar()->value());
+    QPoint delta = event->pos() - mousePos;
+    mousePos = event->pos();
+    horizontalScrollBar()->setValue(scrollbarPos.x() - delta.x());
+    verticalScrollBar()->setValue(scrollbarPos.y() - delta.y());
+  }
+}
+
+void ScribbleScrollArea::mousePressEvent(QMouseEvent* e) {
+  if (scalingMode) {
+    mousePos = e->pos();
+    setCursor(Qt::ClosedHandCursor);
+    scribbleArea->setCursor(Qt::ClosedHandCursor);
+  }
+}
+
+void ScribbleScrollArea::mouseReleaseEvent(QMouseEvent*) {
+  if (scalingMode) {
+    setCursor(Qt::OpenHandCursor);
+    scribbleArea->setCursor(Qt::OpenHandCursor);
   }
 }
 
