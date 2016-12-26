@@ -77,6 +77,8 @@ class ScribbleArea : public QWidget {
   QStack<QImage> undoStack, redoStack;
   QVector<QPoint> polyline;
   QPoint lastPoint;
+  void floodFillStack(const QPoint& from);
+  void floodFillStack8(const QPoint& from);
 };
 
 #endif  // SCRIBBLEAREA_H

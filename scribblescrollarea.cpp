@@ -40,8 +40,7 @@ void ScribbleScrollArea::keyPressEvent(QKeyEvent* event) {
       scribbleArea->setCursor(Qt::OpenHandCursor);
       break;
     default:
-      event->ignore();
-      break;
+      QWidget::keyPressEvent(event);
   }
 }
 
@@ -54,8 +53,7 @@ void ScribbleScrollArea::keyReleaseEvent(QKeyEvent* event) {
       scribbleArea->setCursor(areaCursor);
       break;
     default:
-      event->ignore();
-      break;
+      QWidget::keyReleaseEvent(event);
   }
 }
 

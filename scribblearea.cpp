@@ -26,6 +26,8 @@ ScribbleArea::ScribbleArea(QWidget* parent)
   backgroundToolColor = Qt::red;
   tool = ScribbleArea::ToolType::Pen;
   setCursor(Qt::CrossCursor);
+  setFocusPolicy(Qt::StrongFocus);
+  setFocus();
 }
 
 bool ScribbleArea::openImage(const QString& fileName) {
@@ -146,8 +148,7 @@ void ScribbleArea::keyPressEvent(QKeyEvent* event) {
       equalMode = true;
       break;
     default:
-      event->ignore();
-      break;
+      QWidget::keyPressEvent(event);
   }
 }
 
@@ -157,11 +158,66 @@ void ScribbleArea::keyReleaseEvent(QKeyEvent* event) {
       equalMode = false;
       break;
     default:
-      event->ignore();
-      break;
+      QWidget::keyReleaseEvent(event);
   }
 }
+void ScribbleArea::floodFillStack(const QPoint& from) {
+  QColor targetColor = image.pixelColor(from), fillColor;
+  if (useBackgroundColor) {
+    fillColor = backgroundToolColor;
+  } else {
+    fillColor = foregroundToolColor;
+  }
+  if (targetColor == fillColor) {
+    return;
+  }
+  QStack<QPoint> stack;
+  static const int dx[4] = {0, 1, 0, -1};  // relative neighbor x coordinates
+  static const int dy[4] = {-1, 0, 1, 0};  // relative neighbor y coordinates
 
+  stack.push(from);
+  QPoint buf;
+  while (!stack.isEmpty()) {
+    buf = stack.pop();
+    image.setPixelColor(buf, fillColor);
+    for (int i = 0; i < 4; i++) {
+      int nx = buf.x() + dx[i];
+      int ny = buf.y() + dy[i];
+      if (nx > 0 && nx < image.width() && ny > 0 && ny < image.height() &&
+          image.pixelColor(nx, ny) == targetColor) {
+        stack.push(QPoint(nx, ny));
+      }
+    }
+  }
+}
+void ScribbleArea::floodFillStack8(const QPoint& from) {
+  QColor targetColor = image.pixelColor(from), fillColor;
+  if (useBackgroundColor) {
+    fillColor = backgroundToolColor;
+  } else {
+    fillColor = foregroundToolColor;
+  }
+  if (targetColor == fillColor) {
+    return;
+  }
+  QStack<QPoint> stack;
+  static const int dx[8] = {0, 1, 1, 1, 0, -1, -1, -1};
+  static const int dy[8] = {-1, -1, 0, 1, 1, 1, 0, -1};
+  stack.push(from);
+  QPoint buf;
+  while (!stack.isEmpty()) {
+    buf = stack.pop();
+    image.setPixelColor(buf, fillColor);
+    for (int i = 0; i < 8; i++) {
+      int nx = buf.x() + dx[i];
+      int ny = buf.y() + dy[i];
+      if (nx > 0 && nx < image.width() && ny > 0 && ny < image.height() &&
+          image.pixelColor(nx, ny) == targetColor) {
+        stack.push(QPoint(nx, ny));
+      }
+    }
+  }
+}
 void ScribbleArea::floodFillQueueOptimized(const QPoint& from) {
   QQueue<QPoint> pixelQueue;
   QColor targetColor = image.pixelColor(from), fillColor;
