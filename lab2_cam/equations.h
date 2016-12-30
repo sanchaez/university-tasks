@@ -18,6 +18,7 @@ namespace eq {
 		double	operator()(const double& x) { return _func(x); }
 		double	derivative(const double& x) { return _derivative(x); }
 		int		get_last_iterations()	const { return _iterations_count; }
+		double get_last_error() { return _error; }
 		void set_range(const double &a, const double &b) { _range_a = a; _range_b = b; }
 		double get_range_a() const { return _range_a; }
 		double get_range_b() const { return _range_b; }
@@ -31,12 +32,17 @@ namespace eq {
 			const double precision_constant = abs((1 - q_constant) / q_constant * precision);
 			double x0 = (_range_b - _range_a) / 1.7,
 				xn = phi_function(x0);
-			_iterations_count = 0;
-			while (abs(xn - x0) > precision_constant) {
+			_iterations_count = 1;
+			_error = abs(xn - x0);
+			while (_error > precision_constant) {
 				x0 = xn;
 				xn = phi_function(xn);
 				++_iterations_count;
+				_error = abs(xn - x0);
 			};
+			x0 = xn;
+			xn = phi_function(xn);
+			_error = abs(xn - x0);
 			return xn;
 		}
 
@@ -47,11 +53,13 @@ namespace eq {
 			double x0 = _range_b,
 				xn = iteration_function(_range_b, _range_a);
 			const double min_derivative_range_constant = min_derivative_range();
-			_iterations_count = 0;
-			while (abs(_func(xn) / min_derivative_range_constant) > precision) {
+			_iterations_count = 1;
+			_error = abs(_func(xn) / min_derivative_range_constant);
+			while (_error > precision) {
 				x0 = xn;
 				xn = iteration_function(xn, _range_b);
 				++_iterations_count;
+				_error = abs(_func(xn) / min_derivative_range_constant);
 			}
 			return xn;
 		}
@@ -79,5 +87,6 @@ namespace eq {
 		double _range_a;
 		double _range_b;
 		int _iterations_count;
+		double _error;
 	};
 }

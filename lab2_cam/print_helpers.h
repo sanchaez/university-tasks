@@ -9,7 +9,7 @@ inline void fixed_width_print_obj(T obj, const int& width = 15, const int& preci
 }
 
 template <class T>
-void fixed_width_print_line(std::initializer_list<T> list, const int& width = 15) {
+void fixed_width_print_line(std::initializer_list<T> list, const int& width = 20) {
 	for (T obj : list) {
 		fixed_width_print_obj<T>(obj, width);
 	}

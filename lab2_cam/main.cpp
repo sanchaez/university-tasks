@@ -1,7 +1,7 @@
 #include <iostream>
 #include "print_helpers.h"
 #include "equations.h"
-
+#include <numeric>
 //20: ln(x)- x + 5=0; I, H
 //[a, b] = [5, 7]
 
@@ -17,9 +17,9 @@ typedef double (eq::Equation<double(double)>::*EquationMemberFunction)(const dou
 
 inline void print_table_single_test(eq::Equation<double(double)> &test_equation_object, EquationMemberFunction test_function) {
 	std::cout << std::endl;
-	fixed_width_print_line({ ":precision", ":x" });
+	fixed_width_print_line({ ":precision", ":x", ":error" });
 	for (double precision = 1e-2; precision >= 1e-14; precision *= 1e-3) {
-		fixed_width_print_line({ precision, (test_equation_object.*test_function)(precision) });
+		fixed_width_print_line({ precision, (test_equation_object.*test_function)(precision), test_equation_object.get_last_error() });
 	}
 	std::cout << std::endl;
 };
@@ -28,7 +28,7 @@ inline void print_table_iterations_test(eq::Equation<double(double)> &test_equat
 	std::cout << std::endl;
 	double n_iterative,
 		n_hordes;
-	fixed_width_print_line({ ":precision", ":iterative_count", ":hordes_count" }, 20);
+	fixed_width_print_line({ ":precision", ":iterative_count", ":hordes_count" });
 	for (double precision = 1e-2; precision >= 1e-14; precision *= 1e-3) {
 		test_equation_object.iterative(precision);
 		n_iterative = static_cast<double>(test_equation_object.get_last_iterations());
