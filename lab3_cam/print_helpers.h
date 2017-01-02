@@ -18,3 +18,13 @@ void fixed_width_print_line(std::initializer_list<T> list,
   }
   std::cout << std::endl;
 }
+
+template <typename T>
+void fixed_width_print_line(T list,
+  const int &width = 20) {
+  typedef typename T::value_type value_type;
+  for (value_type obj : list) {
+    fixed_width_print_obj<value_type>(obj, width);
+  }
+  std::cout << std::endl;
+}
