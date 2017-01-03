@@ -1,4 +1,3 @@
-#include "csv.h"
 #include "print_helpers.h"
 #include "solver.h"
 #include <fstream>
@@ -18,7 +17,7 @@ const solver::matrix_type<double> iteration_matrix = {{13, 2, 3, 4, 146},
                                                       {8, 4, 24, 11, 119},
                                                       {8, 11, 5, 36, 109}};
 
-const unsigned int iterations_count_max = 26;
+const unsigned int iterations_count_max = 100;
 
 solver::result_type<double>
 calculation_error(const solver::matrix_type<double>& matrix,
@@ -68,8 +67,8 @@ int main()
   fixed_width_print_obj("it:", 5);
   fixed_width_print_line({":x1", ":x2", ":x3", ":x4"});
   auto transformed_iteration_matrix = solver::prepare_iteration(iteration_matrix);
-  for (unsigned int iterations_count = 1;
-       iterations_count < iterations_count_max; iterations_count += 2)
+  for (unsigned int iterations_count = 5;
+       iterations_count <= iterations_count_max; iterations_count += 5)
   {
     auto z = solver::iteration(transformed_iteration_matrix, iterations_count);
     fixed_width_print_obj(iterations_count, 5);
