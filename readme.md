@@ -1,4 +1,4 @@
-# Lab 2 : Solving systems of linear equations
+# Lab 3 : Solving systems of linear equations
 ## Initial data
 ```
 Input coefficient matrix 1
