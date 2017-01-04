@@ -8,50 +8,95 @@ template <typename T>
 using function_type = std::function<T(T)>;
 
 template <typename T>
-class RangedIntegral
+class AbstractRangedIntegral
 {
 public:
-  RangedIntegral() = default;
-  RangedIntegral(const function_type<T>& function, const T& hstep)
-      : _fn(function), _hstep(hstep){};
-  T operator()(const T& a, const T& b)
+  AbstractRangedIntegral(const function_type<T>& function) : _fn(function){};
+  virtual T operator()(const T& a, const T& b) const { return T(); };
+  constexpr function_type<T> fn() const { return _fn; }
+  virtual void set_fn(const function_type<T>& function) { _fn = function; }
+
+protected:
+  function_type<T> _fn;
+};
+
+template <typename T>
+class AbstractTrapeziumIntegral : public AbstractRangedIntegral<T>
+{
+  using AbstractRangedIntegral<T>::AbstractRangedIntegral;
+
+protected:
+  virtual inline T calculate(const T& a, const T& b, unsigned long long n) const
   {
-    unsigned long long n            = (b - a) / h;
-    T                  result_value = (_fn(a) + _fn(b)) / 2.0;
-    h                               = (b - a) / n;
+    T result_value = (_fn(a) + _fn(b)) / static_cast<T>(2);
+    T h            = (b - a) / static_cast<T>(n);
     for (unsigned long long i = 1; i < n; ++i)
     {
-      result_value += func(a + i * h);
+      result_value += _fn(a + static_cast<T>(i) * h);
     }
     result_value *= h;
     return result_value;
   }
-
-  void set_fn(const function_type<T>& function) { _fn = function; }
-  void set_step(const T& hstep) { _hstep = hstep; }
-  const function_type<T> fn() { return _fn; }
-  const T step() { return _hstep; }
-
-private:
-  function_type<T> _fn;
-  T                _hstep;
 };
 
 template <typename T>
-class RangedIntegralExact
+class RangedTrapeziumStep : public AbstractTrapeziumIntegral<T>
 {
 public:
-  RangedIntegralExact() = default;
-  RangedIntegralExact(const function_type<T>& antiderivative) : _fn(function){};
+  RangedTrapeziumStep(const function_type<T>& function, const T& hstep)
+      : AbstractTrapeziumIntegral<T>(function), _hstep(hstep){};
+  T operator()(const T& a, const T& b) const
+  {
+    return calculate(a, b, static_cast<unsigned long long>((b - a) / _hstep));
+  }
+  void set_step(const T& hstep) { _hstep = hstep; }
+  constexpr T            step() const { return _hstep; }
+
+protected:
+  T _hstep;
+};
+
+template <typename T>
+class RangedIntegralExact : public AbstractRangedIntegral<T>
+{
+public:
+  using AbstractRangedIntegral<T>::AbstractRangedIntegral;
+  T operator()(const T& a, const T& b) const { return _fn(b) - _fn(a); }
+};
+
+template <typename T>
+class RangedTrapeziumRunge : public AbstractTrapeziumIntegral<T>
+{
+public:
+  RangedTrapeziumRunge(const function_type<T>& function, const T& eps)
+      : AbstractTrapeziumIntegral<T>(function), _eps(eps)
+  {
+  }
   T operator()(const T& a, const T& b)
   {
-    return _fn(b) - _fn(a);
-  }
+    unsigned long long n = static_cast<unsigned long long>(1 / sqrt(_eps));
+    //
+    T integral_result_n = calculate(a, b, n);
+    n *= 2;
+    T integral_result_2n = calculate(a, b, n);
+    T rest = abs(integral_result_n - integral_result_2n) / static_cast<T>(3);
 
-  void set_fn(const function_type<T>& function) { _fn = function; }
-  const function_type<T>              fn() { return _fn; }
+    while (rest > _eps)
+    {
+      n *= 2;
+      integral_result_n  = integral_result_2n;
+      integral_result_2n = calculate(a, b, n);
+      rest = abs(integral_result_n - integral_result_2n) / static_cast<T>(3);
+    }
+    _n = n;
+    return integral_result_2n;
+  };
+  void set_eps(const T&        eps) { _eps = eps; }
+  constexpr T                  eps() const { return _eps; }
+  constexpr unsigned long long n() const { return _n; }
 
-private:
-  function_type<T> _fn;
+protected:
+  T                  _eps;
+  unsigned long long _n;
 };
 }
