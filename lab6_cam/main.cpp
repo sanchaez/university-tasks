@@ -2,19 +2,19 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <iomanip>
 
 //using gauss-jordan solving as primary method
 //initial data
-const long double a = 5;
-const long double b = 20;
-const interpolator::size_t steps = 100;
+const long double a = 0;
+const long double b = 7;
+const interpolator::size_t max_steps = 100;
 long double test_function(const long double& x) {
   return 1.65L * log10(abs(sin(3.L * x / 2.L))) / 12.L;
 }
 
-
-void print_spline(interpolator::size_t density, std::string test_file_path) {
+void print_spline(interpolator::size_t density, interpolator::size_t steps, std::string test_file_path) {
   long double h;
   if (a < 0 && b > 0) {
     h = (abs(a) + abs(b)) / density;
@@ -23,7 +23,7 @@ void print_spline(interpolator::size_t density, std::string test_file_path) {
   }
   std::ofstream results_test_file(test_file_path);
   long double x = a;
-  std::cout << "Calculating spline...";
+  std::cout << "Calculating spline for " << test_file_path <<  "...";
   interpolator::CubicSpline<long double> spline(test_function, steps, a, b);
   std::cout << "DONE" << std::endl;
 
@@ -40,9 +40,18 @@ void print_spline(interpolator::size_t density, std::string test_file_path) {
   results_test_file.close();
 }
 
-
+void spline_tests() {
+  for (interpolator::size_t i = 5; i <= max_steps; i *= 2) {
+    std::stringstream s;
+    s << "test_density_" << i << ".csv";
+    print_spline(max_steps * 5, i, s.str());
+  }
+  std::stringstream s;
+  s << "test_density_" << max_steps << ".csv";
+  print_spline(max_steps * 5, max_steps, s.str());
+}
 int main() {
-  print_spline(steps * 5, "test1.csv");
+  spline_tests();
   std::cout << "Press Enter...";
   std::cin.get();
   return 0;
