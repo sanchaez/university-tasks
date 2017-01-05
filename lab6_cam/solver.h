@@ -140,4 +140,35 @@ matrix_type<T> prepare_iteration(const matrix_type<T>& coeff_matrix) {
   }
   return transformed_matrix;
 }
+
+template <typename T = double>
+result_type<T> gauss_jordan(const matrix_type<T>& coeff_matrix) {
+  matrix_type<T> matrix = coeff_matrix;
+  index_type roots_num = matrix.size();
+
+  // Direct path
+
+  for (index_type i = 0; i < roots_num; ++i) {
+    if (matrix[i][i] == static_cast<T>(0)) return result_type<T>();
+    matrix[i] /= matrix[i][i];
+
+    row_type<bool> masked(true, roots_num + 1);
+    for (index_type mask_idx = 0; mask_idx < i; ++mask_idx) {
+      masked[mask_idx] = true;
+    }
+
+    for (index_type k = 0; k < i; ++k) {
+        matrix[k][masked] -= row_type<T>(matrix[i][masked]) * matrix[k][i];
+    }
+    for (index_type k = i + 1; k < roots_num; ++k) {
+        matrix[k][masked] -= row_type<T>(matrix[i][masked]) * matrix[k][i];
+    }
+  }
+  result_type<T> roots(roots_num);
+  for (index_type i = 0; i < roots_num; ++i) {
+    // normalize error
+    roots[i] = matrix[i][roots_num];
+  }
+  return roots;
+}
 }
