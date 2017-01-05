@@ -7,8 +7,8 @@
 
 //using gauss-jordan solving as primary method
 //initial data
-const long double a = 0;
-const long double b = 7;
+const long double a = 5;
+const long double b = 20;
 const interpolator::size_t max_steps = 100;
 long double test_function(const long double& x) {
   return 1.65L * log10(abs(sin(3.L * x / 2.L))) / 12.L;
