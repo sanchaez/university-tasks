@@ -16,6 +16,6 @@ Akima spline does not have this property but it is not covered by this laborator
 ![Graph for 100 step spline](tests/graph1.gif)
 
 ##### Multiple step ranges
-![Graph for multiple splines](tests/graph_all.gif)
+![Graph for multiple splines](tests/test_graph.gif)
 
 You can find the test data in [Advanced Grapher file](tests/test_graph.agr).
