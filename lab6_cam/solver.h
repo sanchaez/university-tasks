@@ -156,7 +156,6 @@ result_type<T> gauss_jordan(const matrix_type<T>& coeff_matrix) {
     for (index_type mask_idx = 0; mask_idx < i; ++mask_idx) {
       masked[mask_idx] = true;
     }
-
     for (index_type k = 0; k < i; ++k) {
         matrix[k][masked] -= row_type<T>(matrix[i][masked]) * matrix[k][i];
     }
@@ -166,7 +165,6 @@ result_type<T> gauss_jordan(const matrix_type<T>& coeff_matrix) {
   }
   result_type<T> roots(roots_num);
   for (index_type i = 0; i < roots_num; ++i) {
-    // normalize error
     roots[i] = matrix[i][roots_num];
   }
   return roots;

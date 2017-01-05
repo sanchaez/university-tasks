@@ -101,11 +101,9 @@ class CubicSpline {
     _spline[0].c = 0;
     _spline[0].d = 0;
 
-    solver::result_type<T> c_result = solver::gauss_jordan(c_matrix);
-    //fallback
-    if (!c_result.size()) {
-      c_result = solver::selection(c_matrix);
-    }
+    //selection method is more precise than gauss-jordan
+    solver::result_type<T> c_result = solver::selection(c_matrix);
+
     for (size_t i = 1; i < _n; ++i) {
       const auto h_i = _spline[i].x - _spline[i - 1].x;
       _spline[i].c = c_result[i];
