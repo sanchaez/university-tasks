@@ -1,6 +1,7 @@
 #pragma once
 #include "integral.h"
 #include "solver.h"
+
 namespace integral {
 template <typename T>
 class AbstractSimpsonIntegral : public AbstractRangedIntegral<T> {

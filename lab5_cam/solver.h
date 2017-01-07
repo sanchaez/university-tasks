@@ -1,5 +1,6 @@
 #pragma once
 #include <valarray>
+#include <cmath>
 
 namespace solver {
 

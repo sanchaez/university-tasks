@@ -30,7 +30,7 @@ void print_polynomial(interpolator::size_t density, interpolator::size_t n, std:
       error = polynomial.error();
       std::cout << "; Error : " << error << std::endl;
     }
-    std::cout << "Last n: " << n_actual << "; Error : " << error << std::endl;
+    std::cout << "Resulting n: " << n_actual << "; Error : " << error << std::endl;
   long double x = a;
   long double h;
   if (a < 0 && b > 0) {
