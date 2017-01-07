@@ -11,7 +11,7 @@ template <typename T>
 class AbstractRangedIntegral {
  public:
   AbstractRangedIntegral(const function_type<T>& function) : _fn(function){};
-  virtual T operator()(const T& a, const T& b) const = 0;
+  virtual T operator()(const T& a, const T& b) const { return T(); };
   constexpr function_type<T> fn() const { return _fn; }
   virtual void set_fn(const function_type<T>& function) { _fn = function; }
 
@@ -26,7 +26,12 @@ class AbstractTrapeziumIntegral : public AbstractRangedIntegral<T> {
  protected:
   virtual inline T calculate(const T& a, const T& b, size_t n) const {
     T result_value = (_fn(a) + _fn(b)) / static_cast<T>(2);
-    T h = (b - a) / static_cast<T>(n);
+    T h;
+    if (a < 0 && b > 0) {
+      h = (abs(a) + abs(b)) / static_cast<T>(n);
+    } else {
+      h = abs(b - a) / static_cast<T>(n);
+    }
     for (size_t i = 1; i < n; ++i) {
       result_value += _fn(a + static_cast<T>(i) * h);
     }

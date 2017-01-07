@@ -101,26 +101,39 @@ result_type<T> selection(const matrix_type<T>& coeff_matrix) {
 // simple iterations method
 // diagonal elements assumed to be nonzero
 template <typename T = double>
-result_type<T> iteration(const matrix_type<T>& transformed_matrix,
-                         const unsigned int& iterations_num) {
+result_type<T> iteration(const matrix_type<T>& coeff_matrix, const T& eps) {
+  matrix_type<T> transformed_matrix = prepare_iteration(coeff_matrix);
   const index_type roots_number = transformed_matrix.size();
-  result_type<T> roots(T(0), roots_number);
-  // starting vector
-  // Roots for iterations
-  result_type<T> tmp_roots(T(0), roots_number);
 
-  for (index_type i = 0; i < static_cast<index_type>(iterations_num); ++i) {
-    for (index_type j = 0; j < roots_number; ++j) {
-      tmp_roots[j] = transformed_matrix[j][0];
-      for (index_type k = 0; k < roots_number; ++k) {
-        tmp_roots[j] += roots[k] * transformed_matrix[j][k + 1];
-      }
-    }
-    roots = tmp_roots;
+
+  T q = m_norm_it(transformed_matrix);
+  if (q >= 1) throw std::exception("Matrix m norm more or equal than 1");
+
+  result_type<T> beta_vector(roots_number);
+  for (index_type i = 0; i < roots_number; ++i) {
+    beta_vector[i] = transformed_matrix[i][0];
   }
+  result_type<bool> alpha_values_mask(true, roots_number + 1);
+  alpha_values_mask[0] = false;
+  result_type<T> tmp_roots(T(0), roots_number);
+  result_type<T> roots(beta_vector);
+
+  const double precision_constant = ((1 - q) / q) * eps;
+  double norm_of_difference;
+  do {
+    tmp_roots = beta_vector;
+    for (index_type i = 0; i < roots_number; ++i) {
+      tmp_roots[i] += static_cast<result_type<T>>(roots *
+        static_cast<result_type<T>>(transformed_matrix[i][alpha_values_mask])).sum();
+    }
+    norm_of_difference = abs(static_cast<row_type<T>>(roots - tmp_roots)).sum();
+    roots = tmp_roots;
+  } while (norm_of_difference > precision_constant);
   return roots;
 }
 
+// private fn
+namespace {
 template <typename T = double>
 matrix_type<T> prepare_iteration(const matrix_type<T>& coeff_matrix) {
   const index_type matrix_rows = coeff_matrix.size();
@@ -141,30 +154,44 @@ matrix_type<T> prepare_iteration(const matrix_type<T>& coeff_matrix) {
 }
 
 template <typename T = double>
-result_type<T> gauss_jordan(const matrix_type<T>& coeff_matrix) {
+T m_norm_it(matrix_type<T> matrix) {
+  const auto roots_num = matrix.size();
+  row_type<T> m_norm_sums(roots_num);
+  row_type<bool> mask(true, roots_num + 1);
+  mask[0] = false;
+  for (index_type i = 0; i < roots_num; ++i) {
+    m_norm_sums[i] = abs(static_cast<row_type<T>>(matrix[i][mask])).sum();
+  }
+  return m_norm_sums.max();
+}
+}
+
+template <typename T>
+result_type<T> single_division(matrix_type<T> coeff_matrix) {
   matrix_type<T> matrix = coeff_matrix;
   index_type roots_num = matrix.size();
-
-  // Direct path
-
   for (index_type i = 0; i < roots_num; ++i) {
-    if (matrix[i][i] == static_cast<T>(0)) return result_type<T>();
-    matrix[i] /= matrix[i][i];
-
-    row_type<bool> masked(true, roots_num + 1);
-    for (index_type mask_idx = 0; mask_idx < i; ++mask_idx) {
-      masked[mask_idx] = true;
-    }
-    for (index_type k = 0; k < i; ++k) {
-        matrix[k][masked] -= row_type<T>(matrix[i][masked]) * matrix[k][i];
-    }
+    T divisor = matrix[i][i];
+    if (divisor == 0.0)
+      throw std::exception("Diagonal element is 0");
+    matrix[i] /= divisor;
     for (index_type k = i + 1; k < roots_num; ++k) {
-        matrix[k][masked] -= row_type<T>(matrix[i][masked]) * matrix[k][i];
+      double coef = matrix[k][i];
+      row_mask_type mask(true, roots_num + 1);
+      for (index_type j = 0; j < i; ++j) {
+        mask[j] = false;
+      }
+      matrix[k][mask] /= row_type<T>(coef, mask.size());
+      matrix[k][mask] -= row_type<T>(matrix[i][mask]);
     }
   }
-  result_type<T> roots(roots_num);
-  for (index_type i = 0; i < roots_num; ++i) {
-    roots[i] = matrix[i][roots_num];
+
+  result_type<T> roots(1, roots_num);
+  for (index_type i = roots_num - 1; i != static_cast<index_type>(-1); --i) {
+    T buffer = matrix[i][roots_num];
+    for (index_type j = roots_num - 1; j > i; --j)
+      buffer -= matrix[i][j] * roots[j];
+    roots[i] = buffer / roots[i];
   }
   return roots;
 }
