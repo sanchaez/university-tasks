@@ -1,7 +1,7 @@
 # cg_lab1
-Computer Graphics Lab 1: DDA, Bresenham & Wu line generation algorithms.
+Computer Graphics Lab 1: DDA, Bresenham & Wu line generation algorithms. Lines are magnified for clarity.
 
-Built in Qt Creator with Qt 5.5.1
+Built in Qt Creator with Qt 5.7.1.
 
 ## Samples
 ![DDA](/samples/_dda.png)
