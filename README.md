@@ -1,5 +1,4 @@
-# lab1_cam
-Function calculus.
+# Lab 1: Function calculus
 
 ## Results
 
